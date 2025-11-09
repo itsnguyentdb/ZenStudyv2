@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/day_card"
+    android:layout_width="match_parent"
+    android:layout_height="80dp"
+    android:layout_margin="1dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp"
+    app:cardUseCompatPadding="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="4dp">
+
+        <!-- Border View -->
+        <View
+            android:id="@+id/border_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- Day Number -->
+        <TextView
+            android:id="@+id/day_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="1"
+            android:textSize="16sp"
+            android:textStyle="normal" />
+
+        <!-- Day Name -->
+        <TextView
+            android:id="@+id/day_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:text="Mon"
+            android:textSize="10sp"
+            android:layout_marginBottom="4dp" />
+
+        <!-- Event Indicator -->
+        <ImageView
+            android:id="@+id/event_indicator"
+            android:layout_width="6dp"
+            android:layout_height="6dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/event_indicator_dot"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

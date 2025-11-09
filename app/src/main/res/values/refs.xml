@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <drawable name="ic_work" />
+    <drawable name="ic_health" />
+    <drawable name="ic_reminder" />
+    <drawable name="ic_birthday" />
+    <drawable name="ic_personal" />
+    <drawable name="ic_appointment" />
+    <drawable name="ic_meeting" />
+</resources>

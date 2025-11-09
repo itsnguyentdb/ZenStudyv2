@@ -1,0 +1,24 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.QuizClone" parent="Theme.Material3.DayNight">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#58CC02</item>
+        <item name="colorPrimaryVariant">#46A302</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+
+        <item name="colorSecondary">#FFB900</item>
+        <item name="colorSecondaryVariant">#FF9F00</item>
+        <item name="colorOnSecondary">#000000</item>
+
+        <item name="android:colorBackground">#F5F6F7</item>
+        <item name="android:textColor">#333333</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="android:fontFamily">@font/quicksand</item>
+    </style>
+
+    <style name="Theme.Quizclone.Fullscreen" parent="Theme.QuizClone"></style>
+
+    <style name="ThemeOverlay.Quizclone.FullscreenContainer" parent=""></style>
+</resources>
