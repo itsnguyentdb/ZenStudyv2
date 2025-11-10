@@ -51,7 +51,7 @@ import com.example.quiz_clone.utils.ModernConverters;
         PomodoroCycle.class,
         Task.class,
         Note.class,
-}, version = 1, exportSchema = false)
+}, version = 4, exportSchema = false)
 @TypeConverters({ModernConverters.class})
 public abstract class AppDatabase extends RoomDatabase {
     private static final String DATABASE_NAME = "zen_study";
@@ -68,6 +68,8 @@ public abstract class AppDatabase extends RoomDatabase {
                                     AppDatabase.class,
                                     DATABASE_NAME
                             )
+                            .fallbackToDestructiveMigration()
+                            .allowMainThreadQueries()
                             .build();
                 }
             }

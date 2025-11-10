@@ -13,7 +13,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
+import lombok.experimental.SuperBuilder;
 @Entity(tableName = "resource"
         , foreignKeys = {
         @ForeignKey(entity = Subject.class, parentColumns = "id", childColumns = "subject_id", onDelete = ForeignKey.CASCADE)
@@ -23,8 +23,7 @@ import lombok.experimental.FieldDefaults;
         @Index(value = "title")
 })
 @Data
-@Builder
-
+@SuperBuilder
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Resource extends BaseEntity {

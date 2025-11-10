@@ -13,13 +13,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 @Entity(tableName = "study_session", foreignKeys = {
         @ForeignKey(entity = Task.class, parentColumns = "id", childColumns = "task_id", onDelete = ForeignKey.CASCADE),
 })
 @Data
-@Builder
-
+@SuperBuilder
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class StudySession extends BaseEntity {
@@ -30,8 +30,6 @@ public class StudySession extends BaseEntity {
     private Date endTime;
 
     private StudySessionMode mode;
-    private Date createdAt;
-    private Date lastUpdatedAt;
 
     public enum StudySessionMode {
         NORMAL,

@@ -14,7 +14,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
+import lombok.experimental.SuperBuilder;
 @Entity(tableName = "quiz_attempt_answer",
         primaryKeys = {"attempt_id", "question_id"},
         foreignKeys = {
@@ -24,8 +24,7 @@ import lombok.experimental.FieldDefaults;
 //        @Index(value = "id"),
 })
 @Data
-@Builder
-
+@SuperBuilder
 @AllArgsConstructor
 public class QuizAttemptAnswer {
     @NonNull

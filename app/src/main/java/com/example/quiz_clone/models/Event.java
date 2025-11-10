@@ -13,13 +13,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 @Entity(tableName = "event", foreignKeys = {
         @ForeignKey(entity = Subject.class, parentColumns = "id", childColumns = "subject_id")
 })
 @Data
-@Builder
-
+@SuperBuilder
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Event extends BaseEntity {

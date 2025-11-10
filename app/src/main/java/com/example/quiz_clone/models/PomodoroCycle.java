@@ -11,13 +11,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
+import lombok.experimental.SuperBuilder;
 @Entity(tableName = "pomodoro_cycle", foreignKeys = {
         @ForeignKey(entity = StudySession.class, parentColumns = "id", childColumns = "session_id")
 })
 @Data
-@Builder
-
+@SuperBuilder
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class PomodoroCycle extends BaseEntity {

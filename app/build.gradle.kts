@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.devtools.ksp")
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -32,7 +34,9 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        compose = true
     }
+    viewBinding { enable = true }
 }
 
 dependencies {
@@ -45,8 +49,18 @@ dependencies {
     implementation(libs.lifecycle.livedata.ktx)
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.material.v1120)
-    compileOnly("org.projectlombok:lombok:1.18.30")
-    annotationProcessor("org.projectlombok:lombok:1.18.30")
+    implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.activity.compose)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.ui)
+    implementation(libs.ui.graphics)
+    implementation(libs.ui.tooling.preview)
+    implementation(libs.material3)
+    implementation(libs.google.material)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.ui.test.junit4)
+    compileOnly(libs.lombok)
+    annotationProcessor(libs.lombok)
     implementation(libs.room.runtime)
     annotationProcessor(libs.room.compiler)
 
@@ -56,4 +70,6 @@ dependencies {
 
     // For Android annotations support
     implementation("androidx.annotation:annotation:1.7.0")
+    debugImplementation(libs.ui.tooling)
+    debugImplementation(libs.ui.test.manifest)
 }

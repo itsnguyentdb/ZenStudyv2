@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FAF9F7"
-    android:orientation="vertical">
+    android:background="#FAF9F7">
 
-    <!-- Search Bar (matching your design) -->
+    <!-- Search Bar -->
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
-        app:cardCornerRadius="99dp"
         app:cardElevation="2dp">
 
         <LinearLayout
@@ -42,12 +41,43 @@
 
     </com.google.android.material.card.MaterialCardView>
 
+    <!-- Subject Filter Bar -->
+    <HorizontalScrollView
+        android:id="@+id/filter_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/card_search"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginBottom="8dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/flashcard_library_filter_chips"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- Chips will be added dynamically -->
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_all"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:checked="true"
+                android:text="All" />
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
     <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_flashcard_decks"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_above="@id/fab_add_deck"
+        android:layout_below="@id/filter_container"
         android:padding="8dp" />
 
     <!-- Empty State -->
@@ -55,6 +85,7 @@
         android:id="@+id/layout_empty_state"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@id/fab_add_deck"
         android:gravity="center"
         android:orientation="vertical"
         android:visibility="gone">
@@ -83,4 +114,17 @@
 
     </LinearLayout>
 
-</LinearLayout>
+    <!-- Add Deck FAB -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_deck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="8dp"
+        android:elevation="12dp"
+        android:src="@drawable/ic_add"
+        app:fabSize="normal"
+        app:tint="@android:color/white" />
+
+</RelativeLayout>

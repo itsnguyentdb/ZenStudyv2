@@ -16,7 +16,7 @@ import androidx.lifecycle.LiveData;
 
 import com.example.quiz_clone.models.FlashcardDeck;
 
-public class FlashcardViewModel extends AndroidViewModel {
+public class StudyFlashcardViewModel extends AndroidViewModel {
     private final FlashcardRepositoryImpl repository;
     private final MutableLiveData<Integer> currentCardIndex = new MutableLiveData<>(0);
     private final MutableLiveData<Boolean> isShowingFront = new MutableLiveData<>(true);
@@ -25,7 +25,7 @@ public class FlashcardViewModel extends AndroidViewModel {
 
     private long deckId;
 
-    public FlashcardViewModel(@NonNull Application application) {
+    public StudyFlashcardViewModel(@NonNull Application application) {
         super(application);
         repository = new FlashcardRepositoryImpl(application);
     }
@@ -37,14 +37,14 @@ public class FlashcardViewModel extends AndroidViewModel {
 
     private void loadDeckData() {
         // Observe deck information
-        repository.getDeckById(deckId).observeForever(deck -> {
+        repository.getDeckLiveDataById(deckId).observeForever(deck -> {
             if (deck != null) {
                 currentDeck.postValue(deck);
             }
         });
 
         // Observe terms for the deck
-        repository.getTermsForDeck(deckId).observeForever(terms -> {
+        repository.getTermsLiveDataForDeck(deckId).observeForever(terms -> {
             if (terms != null && !terms.isEmpty()) {
                 flashcardTerms.postValue(terms);
                 // Reset to first card when terms change

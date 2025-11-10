@@ -8,19 +8,18 @@ import java.util.Date;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 @Entity(tableName = "note", foreignKeys = {
         @ForeignKey(entity = Subject.class, parentColumns = "id", childColumns = "subject_id", onDelete = ForeignKey.CASCADE),
         @ForeignKey(entity = StudySession.class, parentColumns = "id", childColumns = "session_id", onDelete = ForeignKey.CASCADE),
 })
 @Data
-@Builder
-
+@SuperBuilder
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Note extends BaseEntity {
@@ -31,5 +30,4 @@ public class Note extends BaseEntity {
     private String context;
     private String tags;
     private String imageUri;
-    private Date createdAt;
 }

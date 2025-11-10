@@ -12,13 +12,23 @@ import java.util.Map;
 
 public class SettingPreferences {
     private SharedPreferences sharedPreferences;
-
+    public static final String[] BASE_SUBJECTS = {"All", "Math", "Science", "History", "Language", "Computer Science", "Art", "Music", "Other"};
     private static final String DEFAULT_LANGUAGE_CODE = "en";
+
+    private static final String KEY_FIRST_INIT = "first_init";
     private static final String KEY_DARK_MODE = "dark_mode";
     private static final String KEY_APP_LANGUAGES = "languages";
 
     public SettingPreferences(Context context) {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+    }
+
+    public boolean isFirstInit() {
+        return sharedPreferences.getBoolean(KEY_FIRST_INIT, true);
+    }
+
+    public void setFirstInit(boolean value) {
+        sharedPreferences.edit().putBoolean(KEY_FIRST_INIT, value).apply();
     }
 
     public boolean isDarkModeEnabled() {

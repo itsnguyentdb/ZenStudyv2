@@ -23,11 +23,12 @@ public abstract class FlashcardTermDao extends AbstractGenericDao<FlashcardTerm>
         super("flashcard_term");
     }
 
-    @Query("SELECT * FROM flashcard_term WHERE flashcard_deck_id = :deckId")
+    @Query("SELECT * FROM flashcard_term WHERE flashcard_deck_id = :deckId ORDER BY position ASC")
     public abstract LiveData<List<FlashcardTerm>> findByDeckId(long deckId);
 
+    // Add this synchronous method
     @Query("SELECT * FROM flashcard_term WHERE flashcard_deck_id = :deckId ORDER BY position ASC")
-    public abstract List<FlashcardTerm> findByDeckIdOrdered(long deckId);
+    public abstract List<FlashcardTerm> findByDeckIdSync(long deckId);
 
     @Query("SELECT COUNT(id) from flashcard_term WHERE flashcard_deck_id = :deckId")
     public abstract int getFlashcardTermCount(long deckId);
@@ -49,7 +50,7 @@ public abstract class FlashcardTermDao extends AbstractGenericDao<FlashcardTerm>
     @Transaction
     public boolean reorderQuestions(long deckId) {
         try {
-            var termIds = findByDeckIdOrdered(deckId).stream().map(FlashcardTerm::getId)
+            var termIds = findByDeckIdSync(deckId).stream().map(FlashcardTerm::getId)
                     .collect(Collectors.toList());
             var idx = new AtomicInteger(1);
             termIds.forEach(id -> {

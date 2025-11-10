@@ -1,112 +1,86 @@
-package com.example.quiz_clone.fragments;
+package com.example.quiz_clone.activities;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.quiz_clone.R;
 import com.example.quiz_clone.models.FlashcardTerm;
-import com.example.quiz_clone.viewmodels.FlashcardViewModel;
+import com.example.quiz_clone.viewmodels.StudyFlashcardViewModel;
 
-// FlashcardActivity.java
-public class StudyFlashcardFragment extends Fragment {
+public class StudyFlashcardActivity extends AppCompatActivity {
+    public static final String EXTRA_DECK_ID = "deck_id";
 
-    private FlashcardViewModel viewModel;
+    private StudyFlashcardViewModel viewModel;
     private AnimatorSet flipOutAnimator;
     private AnimatorSet flipInAnimator;
     private boolean isFrontVisible = true;
 
     private CardView cardFront, cardBack;
     private TextView termText, definitionText, progressText, deckTitle;
-    private Button prevBtn, nextBtn, ratingEasy, ratingMedium, ratingHard;
-
-
+    private Button prevBtn, nextBtn, flipBtn;
     private long deckId;
 
-    public StudyFlashcardFragment() {
-    }
-
-    public static StudyFlashcardFragment newInstance(long deckId) {
-        var fragment = new StudyFlashcardFragment();
-        Bundle args = new Bundle();
-        args.putLong("DECK_ID", deckId);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_study_flashcard);
 
-        if (getArguments() != null) {
-            deckId = getArguments().getLong("DECK_ID", 1);
-        }
-
+        // Get deck ID from intent
+        deckId = getIntent().getLongExtra(EXTRA_DECK_ID, -1);
         if (deckId == -1) {
-            requireActivity().onBackPressed();
+            finish();
+            return;
         }
-    }
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_flashcard, container, false);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        initViews(view);
+        initViews();
         setupAnimations();
-        setupViewModel(deckId);
-        setupClickListeners(view);
+        setupViewModel();
+        setupClickListeners();
     }
 
-    private void initViews(View view) {
-        cardFront = view.findViewById(R.id.card_front);
-        cardBack = view.findViewById(R.id.card_back);
-        termText = view.findViewById(R.id.term_text);
-        definitionText = view.findViewById(R.id.definition_text);
-        progressText = view.findViewById(R.id.progress_text);
-        deckTitle = view.findViewById(R.id.deck_title);
-        prevBtn = view.findViewById(R.id.prev_btn);
-        nextBtn = view.findViewById(R.id.next_btn);
-        ratingEasy = view.findViewById(R.id.rating_easy);
-        ratingMedium = view.findViewById(R.id.rating_medium);
-        ratingHard = view.findViewById(R.id.rating_hard);
+    private void initViews() {
+        cardFront = findViewById(R.id.card_front);
+        cardBack = findViewById(R.id.card_back);
+        termText = findViewById(R.id.term_text);
+        definitionText = findViewById(R.id.definition_text);
+        progressText = findViewById(R.id.progress_text);
+        deckTitle = findViewById(R.id.deck_title);
+        prevBtn = findViewById(R.id.prev_btn);
+        nextBtn = findViewById(R.id.next_btn);
+        flipBtn = findViewById(R.id.flip_btn);
+
+        // Rating buttons removed from layout, so remove references to them
     }
 
-    private void setupViewModel(long deckId) {
-        viewModel = new ViewModelProvider(this).get(FlashcardViewModel.class);
+    private void setupViewModel() {
+        viewModel = new ViewModelProvider(this).get(StudyFlashcardViewModel.class);
         viewModel.setDeckId(deckId);
 
         // Observe deck data
-        viewModel.getCurrentDeck().observe(getViewLifecycleOwner(), deck -> {
+        viewModel.getCurrentDeck().observe(this, deck -> {
             if (deck != null) {
                 deckTitle.setText(deck.getTitle());
             }
         });
 
         // Observe current card index and terms
-        viewModel.getCurrentCardIndex().observe(getViewLifecycleOwner(), index -> {
+        viewModel.getCurrentCardIndex().observe(this, index -> {
             updateProgress();
             updateCurrentCard();
             updateNavigationButtons();
+            updateFlipButtonText();
         });
 
-        viewModel.getFlashcardTerms().observe(getViewLifecycleOwner(), terms -> {
+        viewModel.getFlashcardTerms().observe(this, terms -> {
             if (terms != null) {
                 updateProgress();
                 updateCurrentCard();
@@ -114,27 +88,27 @@ public class StudyFlashcardFragment extends Fragment {
         });
 
         // Observe card side
-        viewModel.getIsShowingFront().observe(getViewLifecycleOwner(), isFront -> {
+        viewModel.getIsShowingFront().observe(this, isFront -> {
             if (isFront != null && isFront != isFrontVisible) {
                 flipCard();
             }
         });
     }
 
-    private void setupClickListeners(View view) {
-        // Card flip
-        view.findViewById(R.id.card_container).setOnClickListener(v -> {
+    private void setupClickListeners() {
+        // Card flip button
+        flipBtn.setOnClickListener(v -> {
             viewModel.flipCard();
         });
 
-        // Navigation
+        // Navigation buttons
         prevBtn.setOnClickListener(v -> viewModel.previousCard());
         nextBtn.setOnClickListener(v -> viewModel.nextCard());
 
-        // Ratings
-        ratingEasy.setOnClickListener(v -> viewModel.updateCardRating(1));
-        ratingMedium.setOnClickListener(v -> viewModel.updateCardRating(2));
-        ratingHard.setOnClickListener(v -> viewModel.updateCardRating(3));
+        // Optional: Still allow tapping the card to flip
+        findViewById(R.id.card_container).setOnClickListener(v -> {
+            viewModel.flipCard();
+        });
     }
 
     private void updateProgress() {
@@ -149,6 +123,21 @@ public class StudyFlashcardFragment extends Fragment {
     private void updateNavigationButtons() {
         prevBtn.setEnabled(viewModel.hasPreviousCard());
         nextBtn.setEnabled(viewModel.hasNextCard());
+
+        // Update button text based on position
+        if (!viewModel.hasNextCard()) {
+            nextBtn.setText("Finish");
+        } else {
+            nextBtn.setText("Next");
+        }
+    }
+
+    private void updateFlipButtonText() {
+        if (isFrontVisible) {
+            flipBtn.setText("Show Definition");
+        } else {
+            flipBtn.setText("Show Term");
+        }
     }
 
     private void updateCurrentCard() {
@@ -161,6 +150,7 @@ public class StudyFlashcardFragment extends Fragment {
                 flipCardWithoutAnimation();
             }
         }
+        updateFlipButtonText();
     }
 
     private void setupAnimations() {
@@ -199,6 +189,7 @@ public class StudyFlashcardFragment extends Fragment {
             cardBack.setRotationY(-90f);
         }
         isFrontVisible = !isFrontVisible;
+        updateFlipButtonText();
     }
 
     private void flipCardWithoutAnimation() {
@@ -208,13 +199,21 @@ public class StudyFlashcardFragment extends Fragment {
             cardFront.setRotationY(0f);
             cardBack.setRotationY(-90f);
             isFrontVisible = true;
+            updateFlipButtonText();
         }
     }
 
     @Override
-    public void onDestroy() {
+    protected void onDestroy() {
         super.onDestroy();
         if (flipOutAnimator != null) flipOutAnimator.cancel();
         if (flipInAnimator != null) flipInAnimator.cancel();
+    }
+
+    // Static method to start this activity
+    public static void start(AppCompatActivity activity, long deckId) {
+        android.content.Intent intent = new android.content.Intent(activity, StudyFlashcardActivity.class);
+        intent.putExtra(EXTRA_DECK_ID, deckId);
+        activity.startActivity(intent);
     }
 }

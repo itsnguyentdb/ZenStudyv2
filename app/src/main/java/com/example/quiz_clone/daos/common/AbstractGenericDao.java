@@ -91,7 +91,7 @@ public abstract class AbstractGenericDao<E extends BaseEntity> implements Generi
                 new Object[]{id}
         );
         var entity = _findById(query);
-        return entity != null ? Optional.of(_findById(query))
+        return entity != null ? Optional.of(entity)
                 : Optional.empty();
     }
 

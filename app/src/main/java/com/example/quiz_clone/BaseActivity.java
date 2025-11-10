@@ -13,12 +13,13 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.quiz_clone.fragments.FlashcardLibraryFragment;
+import com.example.quiz_clone.fragments.QuizLibraryFragment;
 import com.example.quiz_clone.fragments.SettingsFragment;
 import com.example.quiz_clone.fragments.StatsFragment;
-import com.example.quiz_clone.fragments.StudyFlashcardFragment;
 import com.example.quiz_clone.adapters.BottomNavigationSubMenuAdapter;
 import com.example.quiz_clone.fragments.CalendarFragment;
 import com.example.quiz_clone.fragments.HomeFragment;
+import com.example.quiz_clone.fragments.TaskLibraryFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -51,9 +52,9 @@ public class BaseActivity extends AppCompatActivity implements BottomNavigationS
 
     private void setupSubMenuItems() {
         subMenuItems = new ArrayList<>();
+        subMenuItems.add(new BottomNavigationSubMenuAdapter.SubMenuItem("Tasks", R.drawable.ic_task_selector, TaskLibraryFragment.class));
         subMenuItems.add(new BottomNavigationSubMenuAdapter.SubMenuItem("Flashcards", R.drawable.ic_flashcard_selector, FlashcardLibraryFragment.class));
-        subMenuItems.add(new BottomNavigationSubMenuAdapter.SubMenuItem("Quizzes", 0, null));
-        subMenuItems.add(new BottomNavigationSubMenuAdapter.SubMenuItem("Study", 0, null));
+        subMenuItems.add(new BottomNavigationSubMenuAdapter.SubMenuItem("Quizzes", R.drawable.ic_quiz_selector, QuizLibraryFragment.class));
     }
 
     private void setupSubMenu() {
@@ -130,11 +131,12 @@ public class BaseActivity extends AppCompatActivity implements BottomNavigationS
     }
 
     private void loadFragment(Fragment fragment) {
-        hideSubMenu();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.content_frame, fragment);
         transaction.addToBackStack(null);
         transaction.commit();
+        hideSubMenu();
+        System.out.println(isSubMenuVisible);
     }
 
     private void showSubMenu() {
@@ -157,8 +159,6 @@ public class BaseActivity extends AppCompatActivity implements BottomNavigationS
         try {
             var fragment = item.getFragmentClass().newInstance();
             loadFragment(fragment);
-            hideSubMenu();
-            bottomNavigationView.setSelectedItemId(R.id.navigation_study);
         } catch (IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
         }

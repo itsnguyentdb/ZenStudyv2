@@ -14,7 +14,7 @@ public interface FlashcardRepository {
 
     void addTermToDeck(long deckId, String term, String definition);
 
-    LiveData<FlashcardDeck> getDeckById(long deckId);
+    LiveData<FlashcardDeck> getDeckLiveDataById(long deckId);
 
     LiveData<List<FlashcardDeck>> getAllDecks();
 

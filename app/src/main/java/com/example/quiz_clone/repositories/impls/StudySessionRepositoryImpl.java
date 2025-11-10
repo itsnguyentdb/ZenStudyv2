@@ -11,37 +11,53 @@ import com.example.quiz_clone.helpers.AppDatabase;
 import com.example.quiz_clone.models.StudySession;
 
 import java.util.List;
+import java.util.concurrent.Executor;
 
 public class StudySessionRepositoryImpl {
     private final StudySessionDao studySessionDao;
-    private final PomodoroCycleDao pomodoroCycleDao;
-    private final TaskDao taskDao;
+    private final Executor executor;
 
     public StudySessionRepositoryImpl(Context context) {
         var instance = AppDatabase.getInstance(context);
         studySessionDao = instance.studySessionDao();
-        pomodoroCycleDao = instance.pomodoroCycleDao();
-        taskDao = instance.taskDao();
+        executor = instance.getQueryExecutor();
     }
 
-    public StudySession saveSession(StudySession studySession) {
-        return studySessionDao.save(studySession);
+    public void getSessionsByTaskId(long taskId, OnStudySessionOperationComplete callback) {
+        executor.execute(() -> {
+            try {
+                List<StudySession> sessions = studySessionDao.getSessionsByTaskId(taskId);
+                if (callback != null) {
+                    callback.onSuccess(sessions);
+                }
+            } catch (Exception e) {
+                if (callback != null) {
+                    callback.onError(e);
+                }
+            }
+        });
     }
 
-    public void deleteStudySession(StudySession studySession) {
-        studySessionDao.delete(studySession);
+    public void insertSession(StudySession session, OnStudySessionOperationComplete callback) {
+        executor.execute(() -> {
+            try {
+                studySessionDao.save(session);
+                // Return updated list
+                List<StudySession> sessions = studySessionDao.getSessionsByTaskId(session.getTaskId());
+                if (callback != null) {
+                    callback.onSuccess(sessions);
+                }
+            } catch (Exception e) {
+                if (callback != null) {
+                    callback.onError(e);
+                }
+            }
+        });
     }
 
-    public void deleteStudySession(long studySessionId) {
-        studySessionDao.deleteById(studySessionId);
-    }
+    public interface OnStudySessionOperationComplete {
+        void onSuccess(List<StudySession> sessions);
 
-    public LiveData<StudySession> getStudySessionById(long studySessionId) {
-        return studySessionDao.findByIdLiveData(studySessionId).orElseThrow();
+        void onError(Exception e);
     }
-
-    public LiveData<List<StudySession>> getStudySessionsByTaskId(long taskId) {
-        return studySessionDao.findStudySessionsByTaskIdLiveData(taskId);
-    }
-//    public int getTotalPomodoroRounds
 }

@@ -2,12 +2,17 @@ package com.example.quiz_clone.models;
 
 import androidx.room.PrimaryKey;
 
-import lombok.Getter;
-import lombok.Setter;
+import java.util.Date;
 
-@Setter
-@Getter
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+@NoArgsConstructor
+@Data
+@SuperBuilder
 public class BaseEntity {
     @PrimaryKey(autoGenerate = true)
     protected Long id;
+    protected Date createdAt, lastUpdatedAt;
 }

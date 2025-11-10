@@ -1,39 +1,48 @@
 package com.example.quiz_clone.viewmodels;
 
-
 import android.app.Application;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import com.example.quiz_clone.models.FlashcardDeck;
-import com.example.quiz_clone.repositories.FlashcardRepository;
+import com.example.quiz_clone.models.Subject;
 import com.example.quiz_clone.repositories.impls.FlashcardRepositoryImpl;
+import com.example.quiz_clone.repositories.impls.SubjectRepositoryImpl;
 
 import java.util.List;
+import java.util.Optional;
 
 import lombok.Getter;
 
 public class FlashcardLibraryViewModel extends AndroidViewModel {
-    private FlashcardRepositoryImpl repository;
+    private FlashcardRepositoryImpl flashcardRepository;
+    private SubjectRepositoryImpl subjectRepository;
     @Getter
     private LiveData<List<FlashcardDeck>> allDecks;
+    private LiveData<List<Subject>> allSubjects;
 
     public FlashcardLibraryViewModel(Application application) {
         super(application);
-        repository = new FlashcardRepositoryImpl(application);
-        allDecks = repository.getAllDecks();
+        flashcardRepository = new FlashcardRepositoryImpl(application);
+        subjectRepository = new SubjectRepositoryImpl(application);
+        allDecks = flashcardRepository.getAllDecks();
+        allSubjects = subjectRepository.getAllSubjects();
     }
 
-    public void insert(FlashcardDeck deck) {
-        repository.createFlashcardDeck(deck.getTitle(), deck.getDescription());
+    public LiveData<List<Subject>> getSubjects() {
+        return allSubjects;
     }
 
     public void update(FlashcardDeck deck) {
-        repository.editFlashcardDeck(deck);
+        flashcardRepository.editFlashcardDeck(deck);
     }
 
     public void delete(FlashcardDeck deck) {
-        repository.deleteDeckWithTerms(deck.getId());
+        flashcardRepository.deleteDeckWithTerms(deck.getId());
+    }
+
+    public Optional<Subject> getSubjectById(long subjectId) {
+        return subjectRepository.findSubjectById(subjectId);
     }
 }

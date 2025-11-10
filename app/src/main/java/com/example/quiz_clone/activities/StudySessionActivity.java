@@ -11,6 +11,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.quiz_clone.R;
 
 public class StudySessionActivity extends AppCompatActivity {
+    public static final String EXTRA_TASK_ID = "task_id";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

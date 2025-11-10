@@ -13,11 +13,40 @@
         android:theme="@style/Theme.QuizClone"
         tools:targetApi="31">
         <activity
-            android:name=".activities.StatsActivity"
+            android:name=".activities.StudySessionActivity"
             android:exported="false" />
         <activity
-            android:name=".BaseActivity"
-            android:exported="true">
+            android:name=".activities.TaskDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.SaveTaskActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.QuizAttemptResultActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.FlashcardDeckDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.ReviewQuizAttemptActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.SaveEventActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.SaveQuizActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.TakeQuizActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.StudyFlashcardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.InitActivity"
+            android:exported="true"
+            android:label="@string/title_activity_init"
+            android:theme="@style/Theme.QuizClone">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,18 +54,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.LoadingFlashcardActivity"
+            android:name=".activities.SaveFlashcardDeckActivity"
+            android:exported="false" />
+        <activity
+            android:name=".BaseActivity"
             android:exported="true" />
-        <activity
-            android:name=".activities.StudySessionActivity"
-            android:exported="false" />
-        <activity
-            android:name=".fragments.StudyFlashcardFragment"
-            android:exported="true"
-            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar" />
-        <activity
-            android:name=".activities.QuizActivity"
-            android:exported="false" />
     </application>
 
 </manifest>

@@ -19,9 +19,11 @@ public abstract class ResourceDao extends AbstractGenericDao<Resource> {
     }
 
     @Query("SELECT * FROM resource WHERE subject_id = :subjectId")
-    public abstract List<Resource> findResourcesBySubjectId(long subjectId);
+    public abstract LiveData<List<Resource>> findResourcesBySubjectId(long subjectId);
+
     @RawQuery(observedEntities = {Resource.class})
     protected abstract LiveData<Resource> _findByIdLiveData(SupportSQLiteQuery query);
+
     @RawQuery(observedEntities = {Resource.class})
     protected abstract LiveData<List<Resource>> _findAllLiveData(SupportSQLiteQuery query);
 }

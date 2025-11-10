@@ -5,11 +5,7 @@ import androidx.room.Relation;
 
 import java.util.List;
 
-import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.FieldDefaults;
 
 @Data
 public class QuizWithQuestions {
@@ -19,5 +15,5 @@ public class QuizWithQuestions {
             parentColumn = "id",
             entityColumn = "quiz_id"
     )
-    public List<QuizQuestion> quizQuestions;
+    public List<QuizQuestion> questions;
 }

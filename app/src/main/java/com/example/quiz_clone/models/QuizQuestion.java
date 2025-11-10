@@ -12,15 +12,14 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
+import lombok.experimental.SuperBuilder;
 @Entity(tableName = "quiz_question", foreignKeys = {
         @ForeignKey(entity = Quiz.class, parentColumns = "id", childColumns = "quiz_id", onDelete = ForeignKey.CASCADE)
 }, indices = {
         @Index(value = "id"),
 })
 @Data
-@Builder
-
+@SuperBuilder
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class QuizQuestion extends BaseEntity {

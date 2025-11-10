@@ -11,14 +11,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Entity(tableName = "task", foreignKeys = {
         @ForeignKey(entity = Subject.class, parentColumns = "id", childColumns = "subject_id", onDelete = ForeignKey.CASCADE),
-        @ForeignKey(entity = Task.class, parentColumns = "id", childColumns = "parent_task_id", onDelete = ForeignKey.CASCADE),
+//        @ForeignKey(entity = Task.class, parentColumns = "id", childColumns = "parent_task_id", onDelete = ForeignKey.CASCADE),
 })
 @Data
-@Builder
-
+@SuperBuilder
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Task extends BaseEntity {
@@ -36,9 +36,6 @@ public class Task extends BaseEntity {
     private int level;
     private TaskRepeatType repeatType;
     private TaskType status;
-    private Date createdAt;
-    private Date lastUpdatedAt;
-
 
     public enum TaskType {
         TODO,

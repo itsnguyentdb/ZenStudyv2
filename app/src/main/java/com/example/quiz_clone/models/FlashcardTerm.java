@@ -7,7 +7,7 @@ import androidx.room.Index;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -20,8 +20,7 @@ import lombok.experimental.FieldDefaults;
         @Index(value = "id"),
 })
 @Data
-@Builder
-
+@SuperBuilder
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class FlashcardTerm extends BaseEntity {

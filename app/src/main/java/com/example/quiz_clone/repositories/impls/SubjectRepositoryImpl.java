@@ -12,6 +12,7 @@ import com.example.quiz_clone.models.Resource;
 import com.example.quiz_clone.models.Subject;
 
 import java.util.List;
+import java.util.Optional;
 
 public class SubjectRepositoryImpl {
     private final ResourceDao resourceDao;
@@ -25,10 +26,25 @@ public class SubjectRepositoryImpl {
     }
 
     public LiveData<List<Subject>> getAllSubjects() {
-        return new MutableLiveData<>(subjectDao.findAll());
+        return subjectDao.findAllLiveData();
     }
 
     public LiveData<List<Resource>> getResourcesOfSubject(long subjectId) {
-        return new MutableLiveData<>(resourceDao.findResourcesBySubjectId(subjectId));
+        return resourceDao.findResourcesBySubjectId(subjectId);
+    }
+
+    public Subject addSubject(String subjectTitle) {
+        return subjectDao.save(Subject.builder()
+                .name(subjectTitle)
+                .build()
+        );
+    }
+
+    public Optional<Subject> findSubjectById(long subjectId) {
+        return subjectDao.findById(subjectId);
+    }
+
+    public Optional<Subject> findSubjectByName(String name) {
+        return subjectDao.findByName(name);
     }
 }
