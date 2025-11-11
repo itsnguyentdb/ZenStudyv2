@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.quiz_clone.R;
 import com.example.quiz_clone.adapters.StudySessionAdapter;
+import com.example.quiz_clone.components.SessionTimeDialog;
 import com.example.quiz_clone.models.StudySession;
 import com.example.quiz_clone.models.Task;
 import com.example.quiz_clone.viewmodels.TaskDetailsViewModel;
@@ -303,9 +304,18 @@ public class TaskDetailsActivity extends AppCompatActivity {
     }
 
     private void startStudySession() {
-        Intent intent = new Intent(this, StudySessionActivity.class);
-        intent.putExtra(StudySessionActivity.EXTRA_TASK_ID, taskId);
-        startActivityForResult(intent, REQUEST_STUDY_SESSION);
+        // Show the time selection dialog
+        SessionTimeDialog dialog = new SessionTimeDialog(TaskDetailsActivity.this, taskId);
+        dialog.show();
+
+//        Window window = dialog.getWindow();
+//        if (window != null) {
+//            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//            window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+//        }
+//        Intent intent = new Intent(this, StudySessionActivity.class);
+//        intent.putExtra(StudySessionActivity.EXTRA_TASK_ID, taskId);
+//        startActivityForResult(intent, REQUEST_STUDY_SESSION);
     }
 
     private void editTask() {

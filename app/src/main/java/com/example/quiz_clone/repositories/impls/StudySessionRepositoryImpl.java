@@ -8,6 +8,7 @@ import com.example.quiz_clone.daos.PomodoroCycleDao;
 import com.example.quiz_clone.daos.StudySessionDao;
 import com.example.quiz_clone.daos.TaskDao;
 import com.example.quiz_clone.helpers.AppDatabase;
+import com.example.quiz_clone.models.PomodoroCycle;
 import com.example.quiz_clone.models.StudySession;
 
 import java.util.List;
@@ -15,11 +16,13 @@ import java.util.concurrent.Executor;
 
 public class StudySessionRepositoryImpl {
     private final StudySessionDao studySessionDao;
+    private final PomodoroCycleDao pomodoroCycleDao;
     private final Executor executor;
 
     public StudySessionRepositoryImpl(Context context) {
         var instance = AppDatabase.getInstance(context);
         studySessionDao = instance.studySessionDao();
+        pomodoroCycleDao = instance.pomodoroCycleDao();
         executor = instance.getQueryExecutor();
     }
 
@@ -52,6 +55,18 @@ public class StudySessionRepositoryImpl {
                     callback.onError(e);
                 }
             }
+        });
+    }
+
+    public void insertStudySession(StudySession currentSession) {
+        executor.execute(() -> {
+            studySessionDao.save(currentSession);
+        });
+    }
+
+    public void insertPomodoroCycle(PomodoroCycle currentPomodoroCycle) {
+        executor.execute(() -> {
+            pomodoroCycleDao.save(currentPomodoroCycle);
         });
     }
 
