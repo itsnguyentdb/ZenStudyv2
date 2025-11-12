@@ -3,14 +3,18 @@ package com.example.zen_study.activities;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,16 +24,21 @@ import com.example.zen_study.models.Task;
 import com.example.zen_study.repositories.impls.SubjectRepositoryImpl;
 import com.example.zen_study.repositories.impls.TaskRepositoryImpl;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 
 public class SaveTaskActivity extends AppCompatActivity {
 
@@ -44,7 +53,6 @@ public class SaveTaskActivity extends AppCompatActivity {
     private TextView textDeadline;
     private TextView textProgress;
     private ChipGroup chipGroupPriority;
-    private ChipGroup chipGroupSubject;
     private Spinner spinnerStatus;
     private Spinner spinnerRepeat;
     private LinearProgressIndicator progressBar;
@@ -54,6 +62,15 @@ public class SaveTaskActivity extends AppCompatActivity {
     private View layoutProgress;
     private TextInputLayout textInputLayoutTitle;
 
+    // Subject dropdown
+    private TextInputLayout textInputLayoutSubject;
+    private MaterialAutoCompleteTextView autoSubject;
+    private ArrayAdapter<String> subjectAdapter;
+    private final List<Subject> subjectList = new ArrayList<>();
+    private final Map<String, Long> subjectNameToId = new HashMap<>();
+    private long selectedSubjectId = -1L;
+    private Long pendingSubjectIdForPrefill = null;
+
     private Calendar deadlineCalendar;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
 
@@ -62,8 +79,6 @@ public class SaveTaskActivity extends AppCompatActivity {
     private int currentMode = MODE_CREATE;
     private Task existingTask;
     private long taskId = -1;
-    private String selectedSubjectName = "Other";
-    private Subject selectedSubject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,10 +91,19 @@ public class SaveTaskActivity extends AppCompatActivity {
         setupToolbar();
         setupSpinners();
         setupPriorityChips();
-        setupSubjectChips();
+        setupSubjectDropdown();
         setupDeadlinePicker();
         setupDeleteButton();
         setupActionButtons();
+
+        // Handle back press using dispatcher
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                handleCancel();
+            }
+        });
+
         loadIntentData();
     }
 
@@ -90,7 +114,6 @@ public class SaveTaskActivity extends AppCompatActivity {
         textDeadline = findViewById(R.id.text_deadline);
         textProgress = findViewById(R.id.text_progress);
         chipGroupPriority = findViewById(R.id.chip_group_priority);
-        chipGroupSubject = findViewById(R.id.chip_group_subject);
         spinnerStatus = findViewById(R.id.spinner_status);
         spinnerRepeat = findViewById(R.id.spinner_repeat);
         progressBar = findViewById(R.id.progress_bar);
@@ -99,6 +122,9 @@ public class SaveTaskActivity extends AppCompatActivity {
         btnSave = findViewById(R.id.btn_save);
         layoutProgress = findViewById(R.id.layout_progress);
         textInputLayoutTitle = findViewById(R.id.text_input_layout_title);
+
+        textInputLayoutSubject = findViewById(R.id.text_input_layout_subject);
+        autoSubject = findViewById(R.id.auto_subject);
 
         deadlineCalendar = Calendar.getInstance();
     }
@@ -150,37 +176,78 @@ public class SaveTaskActivity extends AppCompatActivity {
         });
     }
 
-    private void setupSubjectChips() {
-        int[] chipIds = {
-                R.id.chip_math, R.id.chip_science, R.id.chip_history,
-                R.id.chip_language, R.id.chip_computer_science, R.id.chip_other
-        };
+    private void setupSubjectDropdown() {
+        subjectAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_list_item_1,
+                new ArrayList<>()
+        );
+        autoSubject.setAdapter(subjectAdapter);
+        autoSubject.setThreshold(0); // show suggestions immediately when focused
 
-        for (int chipId : chipIds) {
-            Chip chip = findViewById(chipId);
-            if (chip != null) {
-                chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                    if (isChecked) {
-                        selectedSubjectName = chip.getText().toString();
-                        // Uncheck other chips
-                        for (int otherChipId : chipIds) {
-                            if (otherChipId != chip.getId()) {
-                                Chip otherChip = findViewById(otherChipId);
-                                if (otherChip != null) {
-                                    otherChip.setChecked(false);
-                                }
-                            }
-                        }
-                    }
-                });
+        autoSubject.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String name = (String) parent.getItemAtPosition(position);
+                Long subjId = subjectNameToId.get(name);
+                selectedSubjectId = subjId != null ? subjId : -1L;
             }
-        }
+        });
 
-        // Set default selection
-        Chip chipOther = findViewById(R.id.chip_other);
-        if (chipOther != null) {
-            chipOther.setChecked(true);
-        }
+        // Update selectedSubjectId when user types exact match
+        autoSubject.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String txt = s != null ? s.toString().trim() : "";
+                Long subjId = subjectNameToId.get(txt);
+                if (subjId != null) {
+                    selectedSubjectId = subjId;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
+
+        // Observe subjects and populate dropdown
+        subjectRepository.getAllSubjects().observe(this, subjects -> {
+            subjectList.clear();
+            subjectNameToId.clear();
+            subjectAdapter.clear();
+
+            if (subjects != null) {
+                subjectList.addAll(subjects);
+                for (Subject subject : subjects) {
+                    subjectNameToId.put(subject.getName(), subject.getId());
+                    subjectAdapter.add(subject.getName());
+                }
+            }
+            subjectAdapter.notifyDataSetChanged();
+
+            // Prefill selection
+            if (currentMode == MODE_EDIT && pendingSubjectIdForPrefill != null) {
+                setSubjectSelectionById(pendingSubjectIdForPrefill);
+                pendingSubjectIdForPrefill = null;
+            } else if (currentMode == MODE_CREATE) {
+                // Default to first subject if available
+                if (!subjectList.isEmpty() && selectedSubjectId == -1L) {
+                    Subject first = subjectList.get(0);
+                    autoSubject.setText(first.getName(), false);
+                    selectedSubjectId = first.getId();
+                }
+            }
+        });
+
+        // Clicking the field opens the dropdown list
+        autoSubject.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                autoSubject.showDropDown();
+            }
+        });
+        autoSubject.setOnClickListener(v -> autoSubject.showDropDown());
     }
 
     private void setupDeadlinePicker() {
@@ -268,60 +335,27 @@ public class SaveTaskActivity extends AppCompatActivity {
         progressBar.setProgress(progress);
         textProgress.setText(progress + "%");
 
-        // Set subject
-        setSubjectChip(existingTask.getSubjectId());
+        // Set subject (prefill after subjects list is loaded)
+        long subjId = existingTask.getSubjectId();
+        if (!subjectList.isEmpty()) {
+            setSubjectSelectionById(subjId);
+        } else {
+            pendingSubjectIdForPrefill = subjId;
+        }
     }
 
-    private void setSubjectChip(long subjectId) {
-        // In a real app, you'd fetch the subject name from the database
-        // For now, we'll map common subject IDs to names
-        String subjectName = getSubjectNameById(subjectId);
-        int chipId = getChipIdForSubject(subjectName);
-
-        if (chipId != -1) {
-            Chip chip = findViewById(chipId);
-            if (chip != null) {
-                chip.setChecked(true);
-                selectedSubjectName = subjectName;
+    private void setSubjectSelectionById(long subjectId) {
+        Optional<Subject> found = subjectList.stream().filter(s -> s.getId() == subjectId).findFirst();
+        if (found.isPresent()) {
+            autoSubject.setText(found.get().getName(), false);
+            selectedSubjectId = found.get().getId();
+        } else {
+            // fallback: try repository lookup (synchronous allowed)
+            Optional<Subject> fromDb = subjectRepository.findSubjectById(subjectId);
+            if (fromDb.isPresent()) {
+                autoSubject.setText(fromDb.get().getName(), false);
+                selectedSubjectId = fromDb.get().getId();
             }
-        }
-    }
-
-    private String getSubjectNameById(long subjectId) {
-        // This would normally come from your database
-        // For now, using a simple mapping
-        switch ((int) subjectId) {
-            case 1:
-                return "Math";
-            case 2:
-                return "Science";
-            case 3:
-                return "History";
-            case 4:
-                return "Language";
-            case 5:
-                return "Computer Science";
-            default:
-                return "Other";
-        }
-    }
-
-    private int getChipIdForSubject(String subjectName) {
-        switch (subjectName) {
-            case "Math":
-                return R.id.chip_math;
-            case "Science":
-                return R.id.chip_science;
-            case "History":
-                return R.id.chip_history;
-            case "Language":
-                return R.id.chip_language;
-            case "Computer Science":
-                return R.id.chip_computer_science;
-            case "Other":
-                return R.id.chip_other;
-            default:
-                return -1;
         }
     }
 
@@ -426,8 +460,8 @@ public class SaveTaskActivity extends AppCompatActivity {
                     !description.equals(existingTask.getDescription())) {
                 return true;
             }
-            // Add subject comparison
-            if (!selectedSubjectName.equals(getSubjectNameById(existingTask.getSubjectId()))) {
+            // Compare subject by id
+            if (selectedSubjectId != -1L && selectedSubjectId != existingTask.getSubjectId()) {
                 return true;
             }
             return false;
@@ -462,29 +496,9 @@ public class SaveTaskActivity extends AppCompatActivity {
             return 3;
         }
 
-        // Fallback: if no chip is selected, default to medium and select it
         Log.w("SaveTaskActivity", "No priority selected, defaulting to MEDIUM (2)");
         chipGroupPriority.check(R.id.chip_priority_medium);
         return 2;
-    }
-
-    private long getSelectedSubjectId() {
-        // In a real app, you'd get this from the database
-        // For now, using a simple mapping
-        switch (selectedSubjectName) {
-            case "Math":
-                return 1;
-            case "Science":
-                return 2;
-            case "History":
-                return 3;
-            case "Language":
-                return 4;
-            case "Computer Science":
-                return 5;
-            default:
-                return 6; // Other
-        }
     }
 
     private Task createTaskFromInput() {
@@ -512,7 +526,7 @@ public class SaveTaskActivity extends AppCompatActivity {
                 .expectedDuration(duration)
                 .repeatType((Task.TaskRepeatType) spinnerRepeat.getSelectedItem())
                 .status((Task.TaskType) spinnerStatus.getSelectedItem())
-                .subjectId(getSelectedSubjectId())
+                .subjectId(selectedSubjectId)
                 .parentTaskId(0); // You might want to handle parent task selection
 
         if (currentMode == MODE_EDIT && existingTask != null) {
@@ -546,6 +560,16 @@ public class SaveTaskActivity extends AppCompatActivity {
         }
 
         textInputLayoutTitle.setError(null);
+
+        if (selectedSubjectId == -1L) {
+            textInputLayoutSubject.setError("Please select a subject");
+            autoSubject.requestFocus();
+            autoSubject.showDropDown();
+            return false;
+        } else {
+            textInputLayoutSubject.setError(null);
+        }
+
         return true;
     }
 
@@ -597,11 +621,4 @@ public class SaveTaskActivity extends AppCompatActivity {
                 .setNegativeButton("Cancel", null)
                 .show();
     }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        handleCancel();
-    }
-
 }

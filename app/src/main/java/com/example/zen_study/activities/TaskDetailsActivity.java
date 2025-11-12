@@ -88,7 +88,7 @@ public class TaskDetailsActivity extends AppCompatActivity {
         chipSubject = findViewById(R.id.chip_subject);
         btnStartSession = findViewById(R.id.btn_start_session);
         btnCancel = findViewById(R.id.btn_task_details_cancel);
-        btnEdit = findViewById(R.id.btn__task_details_edit);
+        btnEdit = findViewById(R.id.btn_task_details_edit);
         recyclerViewSessions = findViewById(R.id.recycler_view_sessions);
         layoutEmptySessions = findViewById(R.id.layout_empty_sessions);
     }
