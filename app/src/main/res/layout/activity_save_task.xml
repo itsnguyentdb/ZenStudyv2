@@ -179,74 +179,29 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
-                                android:text="Select a subject for your task"
+                                android:text="Search and select a subject"
                                 android:textColor="#6D6D6D"
                                 android:textSize="14sp" />
 
-                            <com.google.android.material.chip.ChipGroup
-                                android:id="@+id/chip_group_subject"
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/text_input_layout_subject"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="12dp"
-                                android:orientation="horizontal"
-                                android:scrollbars="horizontal">
+                                app:boxBackgroundMode="outline"
+                                app:boxCornerRadiusBottomEnd="8dp"
+                                app:boxCornerRadiusBottomStart="8dp"
+                                app:boxCornerRadiusTopEnd="8dp"
+                                app:boxCornerRadiusTopStart="8dp">
 
-                                <com.google.android.material.chip.Chip
-                                    android:id="@+id/chip_math"
-                                    style="@style/Widget.Material3.Chip.Filter"
-                                    android:layout_width="wrap_content"
+                                <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                                    android:id="@+id/auto_subject"
+                                    android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginEnd="8dp"
-                                    android:text="Math" />
+                                    android:hint="Type to search subjects"
+                                    android:inputType="text" />
 
-                                <com.google.android.material.chip.Chip
-                                    android:id="@+id/chip_science"
-                                    style="@style/Widget.Material3.Chip.Filter"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="8dp"
-                                    android:text="Science" />
-
-                                <com.google.android.material.chip.Chip
-                                    android:id="@+id/chip_history"
-                                    style="@style/Widget.Material3.Chip.Filter"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="8dp"
-                                    android:text="History" />
-
-                            </com.google.android.material.chip.ChipGroup>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:orientation="horizontal">
-
-                                <com.google.android.material.chip.Chip
-                                    android:id="@+id/chip_language"
-                                    style="@style/Widget.Material3.Chip.Filter"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="8dp"
-                                    android:text="Language" />
-
-                                <com.google.android.material.chip.Chip
-                                    android:id="@+id/chip_computer_science"
-                                    style="@style/Widget.Material3.Chip.Filter"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="8dp"
-                                    android:text="Computer Science" />
-
-                                <com.google.android.material.chip.Chip
-                                    android:id="@+id/chip_other"
-                                    style="@style/Widget.Material3.Chip.Filter"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Other" />
-
-                            </LinearLayout>
+                            </com.google.android.material.textfield.TextInputLayout>
 
                         </LinearLayout>
 

@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class SettingPreferences {
     private SharedPreferences sharedPreferences;
-    public static final String[] BASE_SUBJECTS = {"All", "Math", "Science", "History", "Language", "Computer Science", "Art", "Music", "Other"};
+    public static final String[] BASE_SUBJECTS = { "Math", "Science", "History", "Language", "Computer Science", "Art", "Music", "Other"};
     private static final String DEFAULT_LANGUAGE_CODE = "en";
 
     private static final String KEY_FIRST_INIT = "first_init";
