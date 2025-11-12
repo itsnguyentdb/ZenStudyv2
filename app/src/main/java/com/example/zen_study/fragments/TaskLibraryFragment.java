@@ -172,13 +172,11 @@ public class TaskLibraryFragment extends Fragment implements TaskLibraryAdapter.
 
     @Override
     public void onTaskEdit(Task task) {
-        // Navigate to edit task screen
-        Bundle args = new Bundle();
-        args.putLong("taskId", task.getId());
-//        Navigation.findNavController(requireView()).navigate(
-//                R.id.action_taskLibraryFragment_to_editTaskFragment,
-//                args
-//        );
+        // Open SaveTaskActivity in edit mode with the selected task ID
+        Intent intent = new Intent(getActivity(), SaveTaskActivity.class);
+        intent.putExtra(SaveTaskActivity.EXTRA_MODE, SaveTaskActivity.MODE_EDIT);
+        intent.putExtra(SaveTaskActivity.EXTRA_TASK_ID, task.getId());
+        startActivity(intent);
     }
 
     @Override

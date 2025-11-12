@@ -27,4 +27,21 @@
         <item>Link</item>
         <item>Note</item>
     </string-array>
+    <string name="add_subject">Add Subject</string>
+    <string name="edit_subject">Edit Subject</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="delete_confirm">Are you sure you want to delete "%1$s"?</string>
+    <string name="search_subjects">Search subjects...</string>
+    <string name="add_subject_accessibility">Add subject</string>
+    <string name="no_subjects_yet">No subjects yet</string>
+    <string name="add_first_subject_hint">Add your first subject using the + button</string>
+    <string name="subject_name_label">Subject name</string>
+    <string name="edit">Edit</string>
+    <string name="delete_action">Delete</string>
+    <string name="enter_name">Enter name</string>
+    <string name="enter_description">Enter description (optional)</string>
+    <string name="subject_add_success">Subject added successfully</string>
+    <string name="subject_update_success">Subject updated successfully</string>
 </resources>

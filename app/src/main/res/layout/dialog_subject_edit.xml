@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <EditText
+        android:id="@+id/edit_subject_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/enter_name"
+        android:autofillHints=""
+        android:inputType="textCapSentences"/>
+
+    <EditText
+        android:id="@+id/edit_subject_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="@string/enter_description"
+        android:autofillHints=""
+        android:inputType="textCapSentences|textMultiLine"/>
+</LinearLayout>

@@ -25,10 +25,10 @@ public abstract class SubjectDao extends AbstractGenericDao<Subject> {
     @Transaction
     public Optional<Subject> findByName(String name) {
         SimpleSQLiteQuery query = new SimpleSQLiteQuery(
-                "SELECT * FROM " + tableName + " WHERE name = ?",
+                "SELECT * FROM " + tableName + " WHERE LOWER(name) = LOWER(?)",
                 new Object[]{name}
         );
-        var entity = _findById(query);
+        var entity = _findByName(query);
         return entity != null ? Optional.of(entity)
                 : Optional.empty();
     }

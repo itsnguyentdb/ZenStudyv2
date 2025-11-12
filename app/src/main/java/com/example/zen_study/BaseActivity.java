@@ -21,6 +21,7 @@ import com.example.zen_study.adapters.BottomNavigationSubMenuAdapter;
 import com.example.zen_study.fragments.CalendarFragment;
 import com.example.zen_study.fragments.HomeFragment;
 import com.example.zen_study.fragments.TaskLibraryFragment;
+import com.example.zen_study.fragments.SubjectLibraryFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -54,6 +55,7 @@ public class BaseActivity extends AppCompatActivity implements BottomNavigationS
     private void setupSubMenuItems() {
         subMenuItems = new ArrayList<>();
         subMenuItems.add(new BottomNavigationSubMenuAdapter.SubMenuItem("Tasks", R.drawable.ic_task_selector, TaskLibraryFragment.class));
+        subMenuItems.add(new BottomNavigationSubMenuAdapter.SubMenuItem("Subjects", R.drawable.ic_info_selector, SubjectLibraryFragment.class));
         subMenuItems.add(new BottomNavigationSubMenuAdapter.SubMenuItem("Flashcards", R.drawable.ic_flashcard_selector, FlashcardLibraryFragment.class));
         subMenuItems.add(new BottomNavigationSubMenuAdapter.SubMenuItem("Quizzes", R.drawable.ic_quiz_selector, QuizLibraryFragment.class));
         subMenuItems.add(new BottomNavigationSubMenuAdapter.SubMenuItem("Resources", R.drawable.ic_flashcard_selector, ResourceLibraryFragment.class));
