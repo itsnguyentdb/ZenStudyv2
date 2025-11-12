@@ -20,6 +20,7 @@ import com.example.quiz_clone.adapters.BottomNavigationSubMenuAdapter;
 import com.example.quiz_clone.fragments.CalendarFragment;
 import com.example.quiz_clone.fragments.HomeFragment;
 import com.example.quiz_clone.fragments.TaskLibraryFragment;
+import com.example.quiz_clone.fragments.SubjectLibraryFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -55,16 +56,18 @@ public class BaseActivity extends AppCompatActivity implements BottomNavigationS
         subMenuItems.add(new BottomNavigationSubMenuAdapter.SubMenuItem("Tasks", R.drawable.ic_task_selector, TaskLibraryFragment.class));
         subMenuItems.add(new BottomNavigationSubMenuAdapter.SubMenuItem("Flashcards", R.drawable.ic_flashcard_selector, FlashcardLibraryFragment.class));
         subMenuItems.add(new BottomNavigationSubMenuAdapter.SubMenuItem("Quizzes", R.drawable.ic_quiz_selector, QuizLibraryFragment.class));
+        // Added Subjects entry with icon
+        subMenuItems.add(new BottomNavigationSubMenuAdapter.SubMenuItem("Subjects", R.drawable.ic_subject_outline, SubjectLibraryFragment.class));
     }
 
     private void setupSubMenu() {
-        subMenuView = LayoutInflater.from(this).inflate(R.layout.layout_bottom_nav_submenu, null);
+        FrameLayout overlayContainer = findViewById(R.id.submenu_overlay_container);
+        subMenuView = LayoutInflater.from(this).inflate(R.layout.layout_bottom_nav_submenu, overlayContainer, false);
         subMenuRecyclerView = subMenuView.findViewById(R.id.recycler_submenu);
         var gridLayoutManager = new GridLayoutManager(this, 4);
         subMenuRecyclerView.setLayoutManager(gridLayoutManager);
         bottomNavigationSubMenuAdapter = new BottomNavigationSubMenuAdapter(subMenuItems, this);
         subMenuRecyclerView.setAdapter(bottomNavigationSubMenuAdapter);
-        FrameLayout overlayContainer = findViewById(R.id.submenu_overlay_container);
 
         overlayContainer.post(() -> {
             int bottomNavHeight = bottomNavigationView.getHeight();

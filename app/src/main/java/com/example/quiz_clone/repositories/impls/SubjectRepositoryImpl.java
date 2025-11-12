@@ -40,6 +40,14 @@ public class SubjectRepositoryImpl {
         );
     }
 
+    public Subject saveSubject(Subject subject) {
+        return subjectDao.save(subject);
+    }
+
+    public void deleteSubject(long subjectId) {
+        subjectDao.deleteById(subjectId);
+    }
+
     public Optional<Subject> findSubjectById(long subjectId) {
         return subjectDao.findById(subjectId);
     }
