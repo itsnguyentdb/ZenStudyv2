@@ -1,0 +1,8 @@
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Shares files from your app's internal private storage -->
+    <files-path name="my_shared_files" path="." />
+    <!-- Shares files from your app's cache directory -->
+    <cache-path name="my_shared_cache" path="." />
+    <!-- Shares files from your app's external storage -->
+    <external-files-path name="my_external_files" path="." />
+</paths>

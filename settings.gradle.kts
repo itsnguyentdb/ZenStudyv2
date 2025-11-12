@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "quiz-clone"
+rootProject.name = "zen-study"
 include(":app")
  

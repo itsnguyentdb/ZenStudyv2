@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.quiz_clone"
+    namespace = "com.example.zen_study"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.quiz_clone"
+        applicationId = "com.example.zen_study"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -72,4 +72,23 @@ dependencies {
     implementation("androidx.annotation:annotation:1.7.0")
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
+
+
+    // Core testing dependencies
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test:rules:1.5.0")
+
+    // Additional testing libraries
+    androidTestImplementation("androidx.test.uiautomator:uiautomator:2.2.0")
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
+
+    // For testing ViewModel and LiveData
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+
+    // Mocking
+    testImplementation("org.mockito:mockito-core:5.3.1")
+    androidTestImplementation("org.mockito:mockito-android:5.3.1")
 }

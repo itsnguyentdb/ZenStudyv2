@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">quiz-clone</string>
+    <string name="app_name">ZenStudy</string>
     <string name="title_activity_fullscreen">FullscreenActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
@@ -16,4 +16,15 @@
         <item quantity="one">%d card</item>
         <item quantity="other">%d cards</item>
     </plurals>
+    <string-array name="resource_types">
+        <item>File</item>
+        <item>Image</item>
+        <item>Video</item>
+        <item>Audio</item>
+        <item>PDF</item>
+        <item>Text</item>
+        <item>Document</item>
+        <item>Link</item>
+        <item>Note</item>
+    </string-array>
 </resources>

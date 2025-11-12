@@ -9,10 +9,46 @@
         <item name="android:background">@color/black_overlay</item>
         <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
     </style>
+
     <style name="RoundButton">
         <item name="android:background">@drawable/rounded_ui</item>
         <item name="android:paddingLeft">20dp</item>
         <item name="android:paddingRight">20dp</item>
         <item name="android:fontFamily">@font/fredoka</item>
+    </style>
+    <!-- Full Screen Dialog Theme -->
+    <style name="FullScreenDialog" parent="Theme.Material3.Light.Dialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@style/DialogAnimation</item>
+    </style>
+
+    <!-- Dialog Animations -->
+    <style name="DialogAnimation">
+        <!-- For slide-up/down animations -->
+        <item name="android:windowEnterAnimation">@anim/slide_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_down</item>
+
+        <!-- Alternative: For fade animations -->
+        <!-- <item name="android:windowEnterAnimation">@anim/fade_in</item> -->
+        <!-- <item name="android:windowExitAnimation">@anim/fade_out</item> -->
+    </style>
+
+    <!-- Bottom Sheet Dialog Theme (Alternative) -->
+    <style name="BottomSheetDialog" parent="Theme.Material3.Light.Dialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@style/BottomSheetAnimation</item>
+    </style>
+
+    <style name="BottomSheetAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_down</item>
     </style>
 </resources>
