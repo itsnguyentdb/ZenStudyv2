@@ -52,10 +52,8 @@ public class SaveResourceActivity extends AppCompatActivity
         // Get intent extras and determine mode
         handleIntentExtras();
 
-        // Setup observers
         setupObservers();
 
-        // Initialize based on mode
         if (isEditMode) {
             setupEditMode();
         } else {
@@ -206,16 +204,47 @@ public class SaveResourceActivity extends AppCompatActivity
     }
 
     private void showEditDialog() {
+        // Check if we already have the data
+        List<Task> currentTasks = resourceViewModel.getAllTasks().getValue();
+        List<Subject> currentSubjects = resourceViewModel.getAllSubjects().getValue();
+
+        if (currentTasks != null && currentSubjects != null) {
+            showEditDialogWithData(currentTasks, currentSubjects);
+        } else {
+            setupEditDataObservers();
+        }
+    }
+
+    private void setupEditDataObservers() {
+        final boolean[] tasksLoaded = {false};
+        final boolean[] subjectsLoaded = {false};
+
         resourceViewModel.getAllTasks().observe(this, tasks -> {
-            resourceViewModel.getAllSubjects().observe(this, subjects -> {
-                ResourceInfoDialogFragment dialog = ResourceInfoDialogFragment.newInstanceForEdit(
-                        existingResource,
-                        tasks != null ? tasks : new ArrayList<>(),
-                        subjects != null ? subjects : new ArrayList<>()
-                );
-                dialog.show(getSupportFragmentManager(), "ResourceInfoDialog");
-            });
+            tasksLoaded[0] = true;
+            if (subjectsLoaded[0]) {
+                showEditDialogWithData(tasks, resourceViewModel.getAllSubjects().getValue());
+            }
         });
+
+        resourceViewModel.getAllSubjects().observe(this, subjects -> {
+            subjectsLoaded[1] = true;
+            if (tasksLoaded[0]) {
+                showEditDialogWithData(resourceViewModel.getAllTasks().getValue(), subjects);
+            }
+        });
+    }
+
+    private void showEditDialogWithData(List<Task> tasks, List<Subject> subjects) {
+        ResourceInfoDialogFragment dialog = ResourceInfoDialogFragment.newInstanceForEdit(
+                existingResource,
+                tasks != null ? tasks : new ArrayList<>(),
+                subjects != null ? subjects : new ArrayList<>()
+        );
+        dialog.show(getSupportFragmentManager(), "ResourceInfoDialog");
+
+        // Remove observers to prevent multiple dialogs
+        resourceViewModel.getAllTasks().removeObservers(this);
+        resourceViewModel.getAllSubjects().removeObservers(this);
     }
 
     @Override

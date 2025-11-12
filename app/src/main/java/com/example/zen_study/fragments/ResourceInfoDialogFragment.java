@@ -2,10 +2,10 @@ package com.example.zen_study.fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -24,13 +24,13 @@ import com.example.zen_study.models.Subject;
 
 import java.util.List;
 
-import lombok.Setter;
-
 public class ResourceInfoDialogFragment extends DialogFragment {
 
     public interface OnResourceInfoListener {
         void onResourceInfoConfirmed(String title, String type, Long taskId, Long subjectId, String description);
+
         void onResourceInfoCancelled();
+
         void onResourceDelete(Long resourceId);
     }
 
@@ -38,13 +38,14 @@ public class ResourceInfoDialogFragment extends DialogFragment {
     private static final String ARG_FILE_TYPE = "file_type";
     private static final String ARG_RESOURCE = "resource";
     private static final String ARG_IS_EDIT_MODE = "is_edit_mode";
+    private static final String ARG_TASKS = "tasks";
+    private static final String ARG_SUBJECTS = "subjects";
+    private static final String ARG_PRESET_TASK_ID = "preset_task_id";
+    private static final String ARG_PRESET_SUBJECT_ID = "preset_subject_id";
 
     private OnResourceInfoListener listener;
-    @Setter
     private List<Task> tasks;
-    @Setter
     private List<Subject> subjects;
-    @Setter
     private Long presetTaskId;
     private Long presetSubjectId;
     private String presetTaskTitle;
@@ -64,20 +65,18 @@ public class ResourceInfoDialogFragment extends DialogFragment {
     private boolean isEditMode = false;
     private Resource existingResource;
 
-    private View dialogView; // Store the view reference
-
     public static ResourceInfoDialogFragment newInstance(String fileName, String fileType,
                                                          List<Task> tasks, List<Subject> subjects,
                                                          Long presetTaskId, Long presetSubjectId) {
         ResourceInfoDialogFragment fragment = new ResourceInfoDialogFragment();
-        fragment.setTasks(tasks);
-        fragment.setSubjects(subjects);
-        fragment.setPresetTaskId(presetTaskId);
-        fragment.setPresetSubjectId(presetSubjectId);
         Bundle args = new Bundle();
         args.putString(ARG_FILE_NAME, fileName);
         args.putString(ARG_FILE_TYPE, fileType);
         args.putBoolean(ARG_IS_EDIT_MODE, false);
+        args.putSerializable(ARG_TASKS, new java.util.ArrayList<>(tasks));
+        args.putSerializable(ARG_SUBJECTS, new java.util.ArrayList<>(subjects));
+        if (presetTaskId != null) args.putLong(ARG_PRESET_TASK_ID, presetTaskId);
+        if (presetSubjectId != null) args.putLong(ARG_PRESET_SUBJECT_ID, presetSubjectId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -86,17 +85,13 @@ public class ResourceInfoDialogFragment extends DialogFragment {
                                                                 List<Task> tasks,
                                                                 List<Subject> subjects) {
         ResourceInfoDialogFragment fragment = new ResourceInfoDialogFragment();
-        fragment.setTasks(tasks);
-        fragment.setSubjects(subjects);
         Bundle args = new Bundle();
         args.putSerializable(ARG_RESOURCE, resource);
         args.putBoolean(ARG_IS_EDIT_MODE, true);
+        args.putSerializable(ARG_TASKS, new java.util.ArrayList<>(tasks));
+        args.putSerializable(ARG_SUBJECTS, new java.util.ArrayList<>(subjects));
         fragment.setArguments(args);
         return fragment;
-    }
-
-    public void setPresetSubjectId(Long subjectId) {
-        this.presetSubjectId = subjectId;
     }
 
     public void setPresetContext(String taskTitle, String subjectName) {
@@ -114,6 +109,10 @@ public class ResourceInfoDialogFragment extends DialogFragment {
             if (isEditMode) {
                 existingResource = (Resource) args.getSerializable(ARG_RESOURCE);
             }
+            tasks = (List<Task>) args.getSerializable(ARG_TASKS);
+            subjects = (List<Subject>) args.getSerializable(ARG_SUBJECTS);
+            presetTaskId = args.containsKey(ARG_PRESET_TASK_ID) ? args.getLong(ARG_PRESET_TASK_ID) : null;
+            presetSubjectId = args.containsKey(ARG_PRESET_SUBJECT_ID) ? args.getLong(ARG_PRESET_SUBJECT_ID) : null;
         }
 
         try {
@@ -123,55 +122,32 @@ public class ResourceInfoDialogFragment extends DialogFragment {
         }
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Inflate the layout and store the view reference
-        dialogView = inflater.inflate(R.layout.dialog_resource_info, container, false);
-        return dialogView;
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        initViews(view);
-        setupSpinners();
-        populateData(); // Now it's safe to populate data
-    }
-
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
 
-        // Inflate the view here for the dialog
-        dialogView = inflater.inflate(R.layout.dialog_resource_info, null);
+        View dialogView = inflater.inflate(R.layout.dialog_resource_info, null);
+
+        initViews(dialogView);
+        setupSpinners();
+        populateData();
 
         builder.setView(dialogView)
                 .setTitle(getDialogTitle())
                 .setPositiveButton(getPositiveButtonText(), null)
                 .setNegativeButton("Cancel", (dialog, id) -> {
-                    listener.onResourceInfoCancelled();
+                    if (listener != null) {
+                        listener.onResourceInfoCancelled();
+                    }
                 });
-
-        if (isEditMode) {
-            builder.setNeutralButton("Delete", (dialog, which) -> {
-                showDeleteConfirmation();
-            });
-        }
 
         AlertDialog dialog = builder.create();
 
-        // Set up button listeners after dialog is shown
         dialog.setOnShowListener(dialogInterface -> {
             Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
             positiveButton.setOnClickListener(v -> validateAndSubmit());
-
-            // Initialize views and populate data here to ensure view is ready
-            initViews(dialogView);
-            setupSpinners();
-            populateData();
         });
 
         return dialog;
@@ -186,8 +162,6 @@ public class ResourceInfoDialogFragment extends DialogFragment {
     }
 
     private void initViews(View view) {
-        if (view == null) return;
-
         textFileName = view.findViewById(R.id.textFileName);
         editTitle = view.findViewById(R.id.editTitle);
         spinnerType = view.findViewById(R.id.spinnerType);
@@ -198,8 +172,6 @@ public class ResourceInfoDialogFragment extends DialogFragment {
     }
 
     private void setupSpinners() {
-        if (spinnerType == null || spinnerTask == null || spinnerSubject == null) return;
-
         // Type spinner
         ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(requireContext(),
                 R.array.resource_types, android.R.layout.simple_spinner_item);
@@ -233,7 +205,7 @@ public class ResourceInfoDialogFragment extends DialogFragment {
         spinnerTask.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectedTaskId = (position == 0) ? null : tasks.get(position - 1).getId();
+                selectedTaskId = (position == 0) ? null : (tasks != null && position - 1 < tasks.size() ? tasks.get(position - 1).getId() : null);
             }
 
             @Override
@@ -242,7 +214,6 @@ public class ResourceInfoDialogFragment extends DialogFragment {
             }
         });
 
-        // Subject spinner
         ArrayAdapter<String> subjectAdapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_spinner_item);
         subjectAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -257,7 +228,7 @@ public class ResourceInfoDialogFragment extends DialogFragment {
         spinnerSubject.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectedSubjectId = (position == 0) ? null : subjects.get(position - 1).getId();
+                selectedSubjectId = (position == 0) ? null : (subjects != null && position - 1 < subjects.size() ? subjects.get(position - 1).getId() : null);
             }
 
             @Override
@@ -277,13 +248,17 @@ public class ResourceInfoDialogFragment extends DialogFragment {
 
     private void populateCreateData() {
         Bundle args = getArguments();
-        if (args == null || textFileName == null || editTitle == null) return;
+        if (args == null) return;
 
         String fileName = args.getString(ARG_FILE_NAME);
         String fileType = args.getString(ARG_FILE_TYPE);
 
-        textFileName.setText(fileName);
-        editTitle.setText(getTitleFromFileName(fileName));
+        if (textFileName != null) {
+            textFileName.setText(fileName);
+        }
+        if (editTitle != null) {
+            editTitle.setText(getTitleFromFileName(fileName));
+        }
         setSpinnerSelection(spinnerType, mapFileTypeToResourceType(fileType));
 
         // Set preset values
@@ -295,25 +270,23 @@ public class ResourceInfoDialogFragment extends DialogFragment {
         }
 
         // Show context hint
-        if (presetTaskTitle != null || presetSubjectName != null) {
+        if ((presetTaskTitle != null || presetSubjectName != null) && textContextHint != null) {
             showContextHint();
         }
     }
 
     private void populateEditData() {
-        if (existingResource == null || textFileName == null) return;
+        if (existingResource == null) return;
 
-        // Use the stored dialogView to find views
-        if (dialogView != null) {
-            TextView selectedFileLabel = dialogView.findViewById(R.id.textSelectedFileLabel);
-            if (selectedFileLabel != null) {
-                selectedFileLabel.setVisibility(View.GONE);
-            }
+        // Hide file name for edit mode
+        if (textFileName != null) {
+            textFileName.setVisibility(View.GONE);
         }
 
-        textFileName.setVisibility(View.GONE);
+        if (editTitle != null) {
+            editTitle.setText(existingResource.getTitle());
+        }
 
-        editTitle.setText(existingResource.getTitle());
         setSpinnerSelection(spinnerType, existingResource.getType());
 
         if (existingResource.getTaskId() != null) {
@@ -347,13 +320,20 @@ public class ResourceInfoDialogFragment extends DialogFragment {
 
     private String mapFileTypeToResourceType(String fileType) {
         switch (fileType) {
-            case "IMAGE": return "Image";
-            case "VIDEO": return "Video";
-            case "AUDIO": return "Audio";
-            case "PDF": return "PDF";
-            case "TEXT": return "Text";
-            case "DOCUMENT": return "Document";
-            default: return "File";
+            case "IMAGE":
+                return "Image";
+            case "VIDEO":
+                return "Video";
+            case "AUDIO":
+                return "Audio";
+            case "PDF":
+                return "PDF";
+            case "TEXT":
+                return "Text";
+            case "DOCUMENT":
+                return "Document";
+            default:
+                return "File";
         }
     }
 
@@ -364,7 +344,7 @@ public class ResourceInfoDialogFragment extends DialogFragment {
         if (adapter == null) return;
 
         for (int i = 0; i < adapter.getCount(); i++) {
-            if (adapter.getItem(i).toString().equalsIgnoreCase(value)) {
+            if (value.equalsIgnoreCase(adapter.getItem(i).toString())) {
                 spinner.setSelection(i);
                 break;
             }
@@ -388,7 +368,7 @@ public class ResourceInfoDialogFragment extends DialogFragment {
             }
 
             if (id.equals(itemId)) {
-                spinner.setSelection(i + 1); // +1 for "No Task/Subject" option
+                spinner.setSelection(i + 1);
                 break;
             }
         }
@@ -414,7 +394,9 @@ public class ResourceInfoDialogFragment extends DialogFragment {
             description = editDescription.getText().toString().trim();
         }
 
-        listener.onResourceInfoConfirmed(title, selectedType, selectedTaskId, selectedSubjectId, description);
+        if (listener != null) {
+            listener.onResourceInfoConfirmed(title, selectedType, selectedTaskId, selectedSubjectId, description);
+        }
         dismiss();
     }
 
@@ -432,5 +414,13 @@ public class ResourceInfoDialogFragment extends DialogFragment {
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
+    }
+
+    @Override
+    public void onCancel(@NonNull DialogInterface dialog) {
+        super.onCancel(dialog);
+        if (listener != null) {
+            listener.onResourceInfoCancelled();
+        }
     }
 }

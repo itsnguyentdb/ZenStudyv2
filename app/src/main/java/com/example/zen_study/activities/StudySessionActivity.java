@@ -3,9 +3,11 @@ package com.example.zen_study.activities;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.lifecycle.ViewModelProvider;
+
 import com.example.zen_study.R;
 import com.example.zen_study.models.StudySession;
 import com.example.zen_study.viewmodels.StudySessionViewModel;
@@ -116,6 +118,7 @@ public class StudySessionActivity extends AppCompatActivity {
                     StudySession.StudySessionMode.POMODORO :
                     StudySession.StudySessionMode.NORMAL;
             viewModel.setMode(mode);
+            viewModel.stopTimer();
         });
 
         // Set initial mode

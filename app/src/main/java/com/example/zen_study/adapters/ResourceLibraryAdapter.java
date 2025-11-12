@@ -66,6 +66,7 @@ public class ResourceLibraryAdapter extends RecyclerView.Adapter<ResourceLibrary
         private final ImageView iconType;
         private final ImageView buttonDelete;
         private final ImageView buttonEdit;
+        private final ImageView buttonDetails;
 
         public ResourceViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -75,6 +76,7 @@ public class ResourceLibraryAdapter extends RecyclerView.Adapter<ResourceLibrary
             iconType = itemView.findViewById(R.id.iconType);
             buttonDelete = itemView.findViewById(R.id.resource_library_button_delete);
             buttonEdit = itemView.findViewById(R.id.resource_library_button_edit);
+            buttonDetails = itemView.findViewById(R.id.resource_library_button_info);
         }
 
         public void bind(Resource resource, OnResourceClickListener listener) {
@@ -94,6 +96,7 @@ public class ResourceLibraryAdapter extends RecyclerView.Adapter<ResourceLibrary
             itemView.setOnClickListener(v -> listener.onResourceClick(resource));
             buttonDelete.setOnClickListener(v -> listener.onResourceDeleteClick(resource));
             buttonEdit.setOnClickListener(v -> listener.onResourceEditClick(resource));
+            buttonDetails.setOnClickListener(v -> listener.onResourceInfoClick(resource));
         }
 
         private void setFileTypeIcon(String fileType) {

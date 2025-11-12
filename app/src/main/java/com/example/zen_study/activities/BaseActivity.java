@@ -1,4 +1,4 @@
-package com.example.zen_study;
+package com.example.zen_study.activities;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.zen_study.R;
 import com.example.zen_study.fragments.FlashcardLibraryFragment;
 import com.example.zen_study.fragments.QuizLibraryFragment;
 import com.example.zen_study.fragments.ResourceLibraryFragment;
@@ -56,7 +57,8 @@ public class BaseActivity extends AppCompatActivity implements BottomNavigationS
         subMenuItems.add(new BottomNavigationSubMenuAdapter.SubMenuItem("Tasks", R.drawable.ic_task_selector, TaskLibraryFragment.class));
         subMenuItems.add(new BottomNavigationSubMenuAdapter.SubMenuItem("Flashcards", R.drawable.ic_flashcard_selector, FlashcardLibraryFragment.class));
         subMenuItems.add(new BottomNavigationSubMenuAdapter.SubMenuItem("Quizzes", R.drawable.ic_quiz_selector, QuizLibraryFragment.class));
-        subMenuItems.add(new BottomNavigationSubMenuAdapter.SubMenuItem("Resources", R.drawable.ic_flashcard_selector, ResourceLibraryFragment.class));
+        subMenuItems.add(new BottomNavigationSubMenuAdapter.SubMenuItem("Resources", R.drawable.ic_resource_selector, ResourceLibraryFragment.class));
+        subMenuItems.add(new BottomNavigationSubMenuAdapter.SubMenuItem("Subjects", R.drawable.ic_subject_selector, ResourceLibraryFragment.class));
     }
 
     private void setupSubMenu() {

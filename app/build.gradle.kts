@@ -91,4 +91,9 @@ dependencies {
     // Mocking
     testImplementation("org.mockito:mockito-core:5.3.1")
     androidTestImplementation("org.mockito:mockito-android:5.3.1")
+
+    implementation(libs.mpandroidchart)
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation("com.github.lzyzsd:circleprogress:1.2.1")
+    implementation("com.google.android.material:material:1.6.0")
 }

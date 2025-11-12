@@ -55,12 +55,6 @@ public class StudySessionRepositoryImpl {
         });
     }
 
-    public void insertStudySession(StudySession currentSession) {
-        executor.execute(() -> {
-            studySessionDao.save(currentSession);
-        });
-    }
-
     public void insertPomodoroCycle(PomodoroCycle currentPomodoroCycle) {
         executor.execute(() -> {
             pomodoroCycleDao.save(currentPomodoroCycle);

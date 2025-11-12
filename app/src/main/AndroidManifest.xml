@@ -61,7 +61,7 @@
             android:name=".activities.SaveFlashcardDeckActivity"
             android:exported="false" />
         <activity
-            android:name=".BaseActivity"
+            android:name=".activities.BaseActivity"
             android:exported="true" />
 
         <provider

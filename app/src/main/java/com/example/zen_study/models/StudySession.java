@@ -9,6 +9,7 @@ import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Entity(tableName = "study_session", foreignKeys = {
@@ -16,6 +17,7 @@ import lombok.experimental.SuperBuilder;
 })
 @Data
 @SuperBuilder
+@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class StudySession extends BaseEntity {

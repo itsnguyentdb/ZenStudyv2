@@ -16,7 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.zen_study.BaseActivity;
+import com.example.zen_study.activities.BaseActivity;
 import com.example.zen_study.R;
 import com.example.zen_study.components.LanguageDialog;
 import com.example.zen_study.viewmodels.SharedSettingsViewModel;

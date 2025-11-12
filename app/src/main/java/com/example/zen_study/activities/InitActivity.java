@@ -5,8 +5,6 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.zen_study.BaseActivity;
-import com.example.zen_study.R;
 import com.example.zen_study.helpers.SettingPreferences;
 import com.example.zen_study.repositories.impls.SubjectRepositoryImpl;
 

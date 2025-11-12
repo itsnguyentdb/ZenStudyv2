@@ -371,10 +371,8 @@ public class ResourceLibraryFragment extends Fragment implements ResourceLibrary
     private void startEditResourceActivity(Resource resource) {
         Intent intent = new Intent(requireContext(), SaveResourceActivity.class);
 
-        // Pass the resource ID to trigger edit mode
         intent.putExtra("resourceId", resource.getId());
 
-        // Optionally pass the current context for reference
         if (selectedTaskId != null) {
             intent.putExtra("taskId", selectedTaskId);
         }

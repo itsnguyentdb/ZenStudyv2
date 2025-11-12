@@ -2,15 +2,18 @@ package com.example.zen_study.viewmodels;
 
 import android.app.Application;
 import android.os.CountDownTimer;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+
 import com.example.zen_study.models.StudySession;
 import com.example.zen_study.models.PomodoroCycle;
 import com.example.zen_study.repositories.impls.StudySessionRepositoryImpl;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class StudySessionViewModel extends AndroidViewModel {
@@ -208,20 +211,30 @@ public class StudySessionViewModel extends AndroidViewModel {
             currentSession.setDuration(duration);
 
             // Save to database
-            repository.insertStudySession(currentSession);
+            repository.insertSession(currentSession, new StudySessionRepositoryImpl.OnStudySessionOperationComplete() {
+                @Override
+                public void onSuccess(List<StudySession> sessions) {
+                    currentSession = sessions.get(0);
+                    if (currentPomodoroCycle != null && currentSession.getId() != 0) {
+                        currentPomodoroCycle.setSessionId(currentSession.getId());
+                        currentPomodoroCycle.setCompletedRounds(currentRound - 1); // Current round is the next one
+                        repository.insertPomodoroCycle(currentPomodoroCycle);
+                    }
+                }
 
-            // Save pomodoro cycle if exists
-            if (currentPomodoroCycle != null && currentSession.getId() != 0) {
-                currentPomodoroCycle.setSessionId(currentSession.getId());
-                currentPomodoroCycle.setCompletedRounds(currentRound - 1); // Current round is the next one
-                repository.insertPomodoroCycle(currentPomodoroCycle);
-            }
+                @Override
+                public void onError(Exception e) {
+//                        error.postValue("Failed to save session: " + e.getMessage());
+                }
+            });
         }
 
+        // Save pomodoro cycle if exists
         // Reset current session
         currentSession = null;
         currentPomodoroCycle = null;
     }
+
 
     // Timer completion handlers
     private void handlePomodoroCycleCompletion() {
