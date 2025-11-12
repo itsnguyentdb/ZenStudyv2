@@ -30,7 +30,7 @@ public class StatsInsightsFragment extends Fragment {
     private TextView tvAverageScore, tvFastestAttempt, tvHighestScoreDeck;
 
     // Notes & Resources views
-    private TextView tvNotesCreated, tvResourcesAdded, tvMostLinkedSubject, tvLastUpdatedNote;
+//    private TextView tvNotesCreated, tvResourcesAdded, tvMostLinkedSubject, tvLastUpdatedNote;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -59,10 +59,10 @@ public class StatsInsightsFragment extends Fragment {
         tvHighestScoreDeck = view.findViewById(R.id.tvHighestScoreDeck);
 
         // Notes & Resources views
-        tvNotesCreated = view.findViewById(R.id.tvNotesCreated);
-        tvResourcesAdded = view.findViewById(R.id.tvResourcesAdded);
-        tvMostLinkedSubject = view.findViewById(R.id.tvMostLinkedSubject);
-        tvLastUpdatedNote = view.findViewById(R.id.tvLastUpdatedNote);
+//        tvNotesCreated = view.findViewById(R.id.tvNotesCreated);
+//        tvResourcesAdded = view.findViewById(R.id.tvResourcesAdded);
+//        tvMostLinkedSubject = view.findViewById(R.id.tvMostLinkedSubject);
+//        tvLastUpdatedNote = view.findViewById(R.id.tvLastUpdatedNote);
     }
 
     private void setupViewModel() {
@@ -72,13 +72,13 @@ public class StatsInsightsFragment extends Fragment {
     private void observeData() {
         viewModel.getFlashcardStats().observe(getViewLifecycleOwner(), this::updateFlashcardStats);
         viewModel.getQuizStats().observe(getViewLifecycleOwner(), this::updateQuizStats);
-        viewModel.getNotesStats().observe(getViewLifecycleOwner(), this::updateNotesStats);
+//        viewModel.getNotesStats().observe(getViewLifecycleOwner(), this::updateNotesStats);
     }
 
     private void setupClickListeners(View view) {
         view.findViewById(R.id.cardFlashcards).setOnClickListener(v -> showFlashcardDetails());
         view.findViewById(R.id.cardQuizzes).setOnClickListener(v -> showQuizDetails());
-        view.findViewById(R.id.cardNotes).setOnClickListener(v -> showNotesDetails());
+//        view.findViewById(R.id.cardNotes).setOnClickListener(v -> showNotesDetails());
     }
 
     private void updateFlashcardStats(FlashcardStats stats) {
@@ -108,19 +108,19 @@ public class StatsInsightsFragment extends Fragment {
         tvHighestScoreDeck.setText("Best Deck: " + stats.getHighestScoreDeck());
     }
 
-    private void updateNotesStats(NotesStats stats) {
-        if (stats == null) return;
-
-        tvNotesCreated.setText("Notes: " + stats.getNotesCount());
-        tvResourcesAdded.setText("Resources: " + stats.getResourcesCount());
-        tvMostLinkedSubject.setText("Most Linked: " + stats.getMostLinkedSubject());
-
-        String lastUpdated = stats.getLastUpdatedNote();
-        if (lastUpdated.length() > 15) {
-            lastUpdated = lastUpdated.substring(0, 15) + "...";
-        }
-        tvLastUpdatedNote.setText("Last: " + lastUpdated);
-    }
+//    private void updateNotesStats(NotesStats stats) {
+//        if (stats == null) return;
+//
+//        tvNotesCreated.setText("Notes: " + stats.getNotesCount());
+//        tvResourcesAdded.setText("Resources: " + stats.getResourcesCount());
+//        tvMostLinkedSubject.setText("Most Linked: " + stats.getMostLinkedSubject());
+//
+//        String lastUpdated = stats.getLastUpdatedNote();
+//        if (lastUpdated.length() > 15) {
+//            lastUpdated = lastUpdated.substring(0, 15) + "...";
+//        }
+//        tvLastUpdatedNote.setText("Last: " + lastUpdated);
+//    }
 
     private void showFlashcardDetails() {
         FlashcardStats stats = viewModel.getFlashcardStats().getValue();
@@ -170,26 +170,26 @@ public class StatsInsightsFragment extends Fragment {
                 .show();
     }
 
-    private void showNotesDetails() {
-        NotesStats stats = viewModel.getNotesStats().getValue();
-        if (stats == null) return;
-
-        StringBuilder message = new StringBuilder();
-        message.append("Total Notes: ").append(stats.getNotesCount()).append("\n");
-        message.append("Total Resources: ").append(stats.getResourcesCount()).append("\n");
-        message.append("Most Active Subject: ").append(stats.getMostLinkedSubject()).append("\n");
-        message.append("Last Updated: ").append(stats.getLastUpdatedNote()).append("\n");
-        message.append("Notes This Week: ").append(stats.getNotesThisWeek());
-
-        new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Notes & Resources Summary")
-                .setMessage(message.toString())
-                .setPositiveButton("OK", null)
-                .setNeutralButton("Create Note", (dialog, which) -> {
-                    navigateToNotes();
-                })
-                .show();
-    }
+//    private void showNotesDetails() {
+//        NotesStats stats = viewModel.getNotesStats().getValue();
+//        if (stats == null) return;
+//
+//        StringBuilder message = new StringBuilder();
+//        message.append("Total Notes: ").append(stats.getNotesCount()).append("\n");
+//        message.append("Total Resources: ").append(stats.getResourcesCount()).append("\n");
+//        message.append("Most Active Subject: ").append(stats.getMostLinkedSubject()).append("\n");
+//        message.append("Last Updated: ").append(stats.getLastUpdatedNote()).append("\n");
+//        message.append("Notes This Week: ").append(stats.getNotesThisWeek());
+//
+//        new MaterialAlertDialogBuilder(requireContext())
+//                .setTitle("Notes & Resources Summary")
+//                .setMessage(message.toString())
+//                .setPositiveButton("OK", null)
+//                .setNeutralButton("Create Note", (dialog, which) -> {
+//                    navigateToNotes();
+//                })
+//                .show();
+//    }
 
     private void navigateToFlashcards() {
         // Implementation to navigate to flashcards section

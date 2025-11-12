@@ -22,7 +22,6 @@ public class TaskRepositoryImpl {
     private final Executor executor;
     private final Handler mainHandler;
 
-
     public TaskRepositoryImpl(Context context) {
         var instance = AppDatabase.getInstance(context);
         subjectDao = instance.subjectDao();
@@ -31,6 +30,17 @@ public class TaskRepositoryImpl {
         mainHandler = new Handler(Looper.getMainLooper());
     }
 
+    // Add synchronous method
+    public List<Task> getAllTasksSync() {
+        try {
+            return taskDao.findAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return java.util.List.of();
+        }
+    }
+
+    // Existing methods remain the same...
     public void insertTask(Task task, OnTaskOperationComplete callback) {
         executor.execute(() -> {
             try {
@@ -105,12 +115,8 @@ public class TaskRepositoryImpl {
     public void getTaskById(long taskId, OnTaskOperationComplete callback) {
         executor.execute(() -> {
             try {
-                // Simulate network/database delay
                 Thread.sleep(500);
-
-                // Create a mock task for testing
                 Task task = taskDao.findById(taskId).orElse(null);
-
                 if (task != null) {
                     callback.onSuccess(task);
                 } else {
@@ -122,10 +128,8 @@ public class TaskRepositoryImpl {
         });
     }
 
-
     public interface OnTaskOperationComplete {
         void onSuccess(Task task);
-
         void onError(Exception e);
     }
 }

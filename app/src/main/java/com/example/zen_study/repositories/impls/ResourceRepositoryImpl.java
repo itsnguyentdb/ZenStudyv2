@@ -91,6 +91,15 @@ public class ResourceRepositoryImpl {
         }
     }
 
+    public List<Resource> getAllResourcesSync() {
+        try {
+            return resourceDao.findAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return java.util.List.of();
+        }
+    }
+
     private FileMetadata uploadFile(Uri uri) {
         File tempFile = null;
         InputStream inputStream = null;

@@ -73,6 +73,23 @@ public class QuizRepositoryImpl {
         );
     }
 
+    public List<Quiz> getAllQuizzesSync() {
+        try {
+            return quizDao.findAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return java.util.List.of();
+        }
+    }
+
+    public List<QuizAttempt> getQuizAttemptsSync(long quizId) {
+        try {
+            return quizAttemptDao.findByQuizId(quizId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return java.util.List.of();
+        }
+    }
 //    public Quiz editQuiz() {
 //        quiz.setLastUpdatedAt(new Date());
 //        return quizDao.save(quiz);

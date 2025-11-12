@@ -131,7 +131,16 @@ public class HomeFragment extends Fragment {
         // You can also observe all tasks if needed for the chart
         taskLibraryViewModel.getAllTasks().observe(getViewLifecycleOwner(), allTasks -> {
             if (allTasks != null) {
-                // Update chart with all tasks data if needed
+                List<Task> incomingTasks = getIncomingTasks(allTasks);
+                if (!incomingTasks.isEmpty()) {
+                    emptyTasksText.setVisibility(View.GONE);
+                    todayTasksRecyclerView.setVisibility(View.VISIBLE);
+                    taskAdapter.setTasks(incomingTasks);
+                } else {
+                    emptyTasksText.setVisibility(View.VISIBLE);
+                    todayTasksRecyclerView.setVisibility(View.GONE);
+                    taskAdapter.setTasks(new ArrayList<>());
+                }
             }
         });
     }
@@ -197,7 +206,7 @@ public class HomeFragment extends Fragment {
     private List<Resource> getRecentResources(List<Resource> allResources) {
         // Sort by updated date and return only recent ones
         List<Resource> sorted = new ArrayList<>(allResources);
-        Collections.sort(sorted, (r1, r2) -> {
+        sorted.sort((r1, r2) -> {
             Date date1 = r2.getUpdatedAt() != null ? r2.getUpdatedAt() : r2.getCreatedAt();
             Date date2 = r1.getUpdatedAt() != null ? r1.getUpdatedAt() : r1.getCreatedAt();
 
@@ -208,8 +217,24 @@ public class HomeFragment extends Fragment {
             return date2.compareTo(date1);
         });
 
-        // Return only the 5 most recent resources
         return sorted.subList(0, Math.min(sorted.size(), 5));
+    }
+
+    private List<Task> getIncomingTasks(List<Task> allTasks) {
+        // Sort by updated date and return only recent ones
+        List<Task> sorted = new ArrayList<>(allTasks);
+        sorted.sort((r1, r2) -> {
+            Date date1 = r2.getDeadline() != null ? r2.getDeadline() : r2.getCreatedAt();
+            Date date2 = r1.getDeadline() != null ? r1.getDeadline() : r1.getCreatedAt();
+
+            if (date1 == null && date2 == null) return 0;
+            if (date1 == null) return -1;
+            if (date2 == null) return 1;
+
+            return date2.compareTo(date1);
+        });
+
+        return sorted.subList(0, Math.min(sorted.size(), 3));
     }
 
     private void updateWelcomeMessage() {

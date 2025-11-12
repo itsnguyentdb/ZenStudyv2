@@ -172,82 +172,82 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Notes & Resources -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardNotes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
+<!--        &lt;!&ndash; Notes & Resources &ndash;&gt;-->
+<!--        <com.google.android.material.card.MaterialCardView-->
+<!--            android:id="@+id/cardNotes"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:cardCornerRadius="12dp"-->
+<!--            app:cardElevation="4dp">-->
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="vertical"-->
+<!--                android:padding="16dp">-->
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="📝 Notes and Resources"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="16dp" />
+<!--                <TextView-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="📝 Notes and Resources"-->
+<!--                    android:textSize="18sp"-->
+<!--                    android:textStyle="bold"-->
+<!--                    android:layout_marginBottom="16dp" />-->
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:weightSum="2">
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="horizontal"-->
+<!--                    android:weightSum="2">-->
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:padding="8dp">
+<!--                    <LinearLayout-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:orientation="vertical"-->
+<!--                        android:padding="8dp">-->
 
-                        <TextView
-                            android:id="@+id/tvNotesCreated"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Notes: 32"
-                            android:textSize="14sp"
-                            android:layout_marginBottom="4dp" />
+<!--                        <TextView-->
+<!--                            android:id="@+id/tvNotesCreated"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="Notes: 32"-->
+<!--                            android:textSize="14sp"-->
+<!--                            android:layout_marginBottom="4dp" />-->
 
-                        <TextView
-                            android:id="@+id/tvResourcesAdded"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Resources: 18"
-                            android:textSize="14sp" />
-                    </LinearLayout>
+<!--                        <TextView-->
+<!--                            android:id="@+id/tvResourcesAdded"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="Resources: 18"-->
+<!--                            android:textSize="14sp" />-->
+<!--                    </LinearLayout>-->
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:padding="8dp">
+<!--                    <LinearLayout-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:orientation="vertical"-->
+<!--                        android:padding="8dp">-->
 
-                        <TextView
-                            android:id="@+id/tvMostLinkedSubject"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Most Linked: Math"
-                            android:textSize="14sp"
-                            android:layout_marginBottom="4dp" />
+<!--                        <TextView-->
+<!--                            android:id="@+id/tvMostLinkedSubject"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="Most Linked: Math"-->
+<!--                            android:textSize="14sp"-->
+<!--                            android:layout_marginBottom="4dp" />-->
 
-                        <TextView
-                            android:id="@+id/tvLastUpdatedNote"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Last: Derivatives"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-                </LinearLayout>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+<!--                        <TextView-->
+<!--                            android:id="@+id/tvLastUpdatedNote"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="Last: Derivatives"-->
+<!--                            android:textSize="14sp" />-->
+<!--                    </LinearLayout>-->
+<!--                </LinearLayout>-->
+<!--            </LinearLayout>-->
+<!--        </com.google.android.material.card.MaterialCardView>-->
 
     </LinearLayout>
 </ScrollView>

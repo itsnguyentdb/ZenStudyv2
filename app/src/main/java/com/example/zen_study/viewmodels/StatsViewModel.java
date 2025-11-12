@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.example.zen_study.dto.DailyStudyTime;
 import com.example.zen_study.dto.FlashcardStats;
@@ -93,16 +92,15 @@ public class StatsViewModel extends AndroidViewModel {
         loadTaskProgress();
         loadFlashcardStats();
         loadQuizStats();
-        loadNotesStats();
+//        loadNotesStats();
     }
 
     private void loadStudyOverview() {
-        // Load study overview data from multiple repositories
         new Thread(() -> {
             try {
-                // Get total study time from sessions
-                long totalStudyTimeMs = getTotalStudyTime();
-                int sessionsCompleted = getSessionsCount();
+                // Get actual data from repositories
+                long totalStudyTimeMs = studySessionRepository.getTotalStudyTime();
+                int sessionsCompleted = studySessionRepository.getSessionsCount();
                 int currentStreak = calculateCurrentStreak();
                 int averageFocus = calculateAverageFocus();
 
@@ -123,7 +121,7 @@ public class StatsViewModel extends AndroidViewModel {
     private void loadTimeAnalyticsData() {
         new Thread(() -> {
             try {
-                List<StudySession> sessions = getSessionsForTimePeriod(currentTimePeriod);
+                List<StudySession> sessions = studySessionRepository.getSessionsForTimePeriod(currentTimePeriod);
                 List<DailyStudyTime> dailyData = convertSessionsToDailyData(sessions);
                 List<WeeklyAverage> weeklyData = convertSessionsToWeeklyData(sessions);
 
@@ -138,8 +136,8 @@ public class StatsViewModel extends AndroidViewModel {
     private void loadSubjectBreakdown() {
         new Thread(() -> {
             try {
-                List<Subject> subjects = subjectRepository.getAllSubjects().getValue();
-                Map<Long, Long> subjectStudyTime = getStudyTimeBySubject();
+                List<Subject> subjects = subjectRepository.getAllSubjectsSync();
+                Map<Long, Long> subjectStudyTime = studySessionRepository.getStudyTimeBySubject();
 
                 if (subjects != null) {
                     List<SubjectStats> subjectStats = createSubjectStats(subjects, subjectStudyTime);
@@ -152,31 +150,41 @@ public class StatsViewModel extends AndroidViewModel {
     }
 
     private void loadTaskProgress() {
-        taskRepository.getAllTasks().observeForever(tasks -> {
-            if (tasks != null) {
-                TaskProgress progress = calculateTaskProgress(tasks);
-                taskProgress.postValue(progress);
+        new Thread(() -> {
+            try {
+                List<Task> tasks = taskRepository.getAllTasksSync();
+                if (tasks != null) {
+                    TaskProgress progress = calculateTaskProgress(tasks);
+                    taskProgress.postValue(progress);
 
-                List<Task> upcoming = getUpcomingTasks(tasks);
-                upcomingTasks.postValue(upcoming);
+                    List<Task> upcoming = getUpcomingTasks(tasks);
+                    upcomingTasks.postValue(upcoming);
+                }
+            } catch (Exception e) {
+                Log.e("StatsViewModel", "Error loading task progress", e);
             }
-        });
+        }).start();
     }
 
     private void loadFlashcardStats() {
-        flashcardRepository.getAllDecks().observeForever(decks -> {
-            if (decks != null) {
-                List<FlashcardTerm> allTerms = getAllFlashcardTerms(decks);
-                FlashcardStats stats = createFlashcardStats(decks, allTerms);
-                flashcardStats.postValue(stats);
+        new Thread(() -> {
+            try {
+                List<FlashcardDeck> decks = flashcardRepository.getAllDecksSync();
+                if (decks != null) {
+                    List<FlashcardTerm> allTerms = getAllFlashcardTerms(decks);
+                    FlashcardStats stats = createFlashcardStats(decks, allTerms);
+                    flashcardStats.postValue(stats);
+                }
+            } catch (Exception e) {
+                Log.e("StatsViewModel", "Error loading flashcard stats", e);
             }
-        });
+        }).start();
     }
 
     private void loadQuizStats() {
         new Thread(() -> {
             try {
-                List<Quiz> quizzes = quizRepository.getAllQuizzes();
+                List<Quiz> quizzes = quizRepository.getAllQuizzesSync();
                 List<QuizAttempt> allAttempts = getAllQuizAttempts(quizzes);
                 QuizStats stats = createQuizStats(quizzes, allAttempts);
                 quizStats.postValue(stats);
@@ -186,63 +194,90 @@ public class StatsViewModel extends AndroidViewModel {
         }).start();
     }
 
-    private void loadNotesStats() {
-        new Thread(() -> {
-            try {
-                List<Resource> resources = resourceRepository.getAllResources().getValue();
-                // Note: You'll need to create a NoteRepository similar to your other repositories
-                // For now, we'll use placeholder data
-                NotesStats stats = createNotesStats(resources);
-                notesStats.postValue(stats);
-            } catch (Exception e) {
-                Log.e("StatsViewModel", "Error loading notes stats", e);
-            }
-        }).start();
-    }
+//    private void loadNotesStats() {
+//        new Thread(() -> {
+//            try {
+//                List<Resource> resources = resourceRepository.getAllResourcesSync();
+//                NotesStats stats = createNotesStats(resources);
+//                notesStats.postValue(stats);
+//            } catch (Exception e) {
+//                Log.e("StatsViewModel", "Error loading notes stats", e);
+//            }
+//        }).start();
+//    }
 
     // Helper methods for data processing
 
-    private long getTotalStudyTime() {
-        // This would require a new method in StudySessionRepository
-        // For now, return placeholder
-        return 18 * 60 * 60 * 1000L; // 18 hours in milliseconds
-    }
-
-    private int getSessionsCount() {
-        // This would require a new method in StudySessionRepository
-        return 42; // placeholder
-    }
-
     private int calculateCurrentStreak() {
-        // Implement streak calculation based on study sessions
-        return 6; // placeholder
+        List<StudySession> allSessions = studySessionRepository.getAllSessionsSync();
+        if (allSessions == null || allSessions.isEmpty()) {
+            return 0;
+        }
+
+        // Sort sessions by date (newest first)
+        allSessions.sort((s1, s2) -> s2.getStartTime().compareTo(s1.getStartTime()));
+
+        Calendar cal = Calendar.getInstance();
+        int streak = 0;
+        Date currentDate = new Date();
+
+        // Check if today has a session
+        boolean todayHasSession = allSessions.stream()
+                .anyMatch(session -> isSameDay(session.getStartTime(), currentDate));
+
+        if (todayHasSession) {
+            streak = 1;
+        } else {
+            return 0; // No session today, streak is broken
+        }
+
+        // Check consecutive days backwards
+        cal.setTime(currentDate);
+        for (int i = 1; i <= allSessions.size(); i++) {
+            cal.add(Calendar.DAY_OF_YEAR, -1);
+            Date previousDate = cal.getTime();
+
+            boolean dayHasSession = allSessions.stream()
+                    .anyMatch(session -> isSameDay(session.getStartTime(), previousDate));
+
+            if (dayHasSession) {
+                streak++;
+            } else {
+                break;
+            }
+        }
+
+        return streak;
     }
 
     private int calculateAverageFocus() {
-        // Calculate from Pomodoro cycles
-        return 84; // placeholder
-    }
+        List<StudySession> recentSessions = studySessionRepository.getSessionsForTimePeriod(TimePeriod.WEEK);
+        if (recentSessions == null || recentSessions.isEmpty()) {
+            return 0;
+        }
 
-    private List<StudySession> getSessionsForTimePeriod(TimePeriod period) {
-        // This would require a new method in StudySessionRepository
-        // Return placeholder data for now
-        return createMockSessions();
-    }
+        // Calculate average session duration as a proxy for focus
+        long totalDuration = 0;
+        for (StudySession session : recentSessions) {
+            totalDuration += session.getDuration();
+        }
 
-    private Map<Long, Long> getStudyTimeBySubject() {
-        // This would require a new method in StudySessionRepository
-        Map<Long, Long> result = new HashMap<>();
-        result.put(1L, 8 * 60 * 60 * 1000L); // 8 hours for subject 1
-        result.put(2L, 5 * 60 * 60 * 1000L); // 5 hours for subject 2
-        result.put(3L, 3 * 60 * 60 * 1000L); // 3 hours for subject 3
-        return result;
+        long averageDurationMs = totalDuration / recentSessions.size();
+        long averageMinutes = averageDurationMs / (1000 * 60);
+
+        // Convert to a focus score (0-100) based on session length
+        // Assuming 25 minutes (one Pomodoro) = 50%, 50 minutes = 100%
+        int focusScore = (int) Math.min(100, (averageMinutes * 100) / 50);
+        return Math.max(0, focusScore);
     }
 
     private List<FlashcardTerm> getAllFlashcardTerms(List<FlashcardDeck> decks) {
         List<FlashcardTerm> allTerms = new ArrayList<>();
         for (FlashcardDeck deck : decks) {
-            List<FlashcardTerm> terms = flashcardRepository.getTermsForDeck(deck.getId());
-            allTerms.addAll(terms);
+            List<FlashcardTerm> terms = flashcardRepository.getTermsForDeckSync(deck.getId());
+            if (terms != null) {
+                allTerms.addAll(terms);
+            }
         }
         return allTerms;
     }
@@ -250,20 +285,22 @@ public class StatsViewModel extends AndroidViewModel {
     private List<QuizAttempt> getAllQuizAttempts(List<Quiz> quizzes) {
         List<QuizAttempt> allAttempts = new ArrayList<>();
         for (Quiz quiz : quizzes) {
-            List<QuizAttempt> attempts = quizRepository.getQuizAttempts(quiz.getId());
-            allAttempts.addAll(attempts);
+            List<QuizAttempt> attempts = quizRepository.getQuizAttemptsSync(quiz.getId());
+            if (attempts != null) {
+                allAttempts.addAll(attempts);
+            }
         }
         return allAttempts;
     }
 
-    // Data conversion methods (same as before but adapted for your repositories)
+    // Data conversion methods
 
     private List<DailyStudyTime> convertSessionsToDailyData(List<StudySession> sessions) {
         Map<String, Float> dailyMinutes = new HashMap<>();
 
         for (StudySession session : sessions) {
             String dayKey = getDayKey(session.getStartTime());
-            float minutes = session.getDuration() / (1000 * 60); // Convert ms to minutes
+            float minutes = session.getDuration() / (1000.0f * 60.0f); // Convert ms to minutes
             dailyMinutes.put(dayKey, dailyMinutes.getOrDefault(dayKey, 0f) + minutes);
         }
 
@@ -271,6 +308,14 @@ public class StatsViewModel extends AndroidViewModel {
         for (Map.Entry<String, Float> entry : dailyMinutes.entrySet()) {
             result.add(new DailyStudyTime(entry.getKey(), entry.getValue()));
         }
+
+        // Sort by day of week
+        result.sort((d1, d2) -> {
+            String[] days = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+            int index1 = getDayIndex(d1.getDayLabel(), days);
+            int index2 = getDayIndex(d2.getDayLabel(), days);
+            return Integer.compare(index1, index2);
+        });
 
         return result;
     }
@@ -280,7 +325,7 @@ public class StatsViewModel extends AndroidViewModel {
 
         for (StudySession session : sessions) {
             String weekKey = getWeekKey(session.getStartTime());
-            float hours = session.getDuration() / (1000 * 60 * 60); // Convert ms to hours
+            float hours = session.getDuration() / (1000.0f * 60.0f * 60.0f); // Convert ms to hours
 
             if (!weeklyData.containsKey(weekKey)) {
                 weeklyData.put(weekKey, new ArrayList<>());
@@ -294,6 +339,13 @@ public class StatsViewModel extends AndroidViewModel {
             result.add(new WeeklyAverage(entry.getKey(), average));
         }
 
+        // Sort by week number
+        result.sort((w1, w2) -> {
+            int week1 = extractWeekNumber(w1.getWeekLabel());
+            int week2 = extractWeekNumber(w2.getWeekLabel());
+            return Integer.compare(week1, week2);
+        });
+
         return result;
     }
 
@@ -304,7 +356,7 @@ public class StatsViewModel extends AndroidViewModel {
         for (Subject subject : subjects) {
             Long subjectId = subject.getId();
             long studyTimeMs = subjectTimes.getOrDefault(subjectId, 0L);
-            float minutes = studyTimeMs / (1000 * 60);
+            float minutes = studyTimeMs / (1000.0f * 60.0f);
             float percentage = totalTime > 0 ? (studyTimeMs * 100f) / totalTime : 0;
 
             String timeFormatted = formatStudyTime(minutes);
@@ -347,19 +399,24 @@ public class StatsViewModel extends AndroidViewModel {
         for (Task task : tasks) {
             if (task.getDeadline() != null &&
                     task.getStatus() != Task.TaskType.COMPLETED &&
-                    (isSameDay(task.getDeadline(), tomorrow) ||
+                    (isSameDay(task.getDeadline(), new Date()) ||
+                            isSameDay(task.getDeadline(), tomorrow) ||
                             isSameDay(task.getDeadline(), dayAfterTomorrow))) {
                 upcoming.add(task);
             }
         }
 
         upcoming.sort(Comparator.comparing(Task::getDeadline));
-        return upcoming;
+        return upcoming.size() > 5 ? upcoming.subList(0, 5) : upcoming; // Limit to 5 tasks
     }
 
     private FlashcardStats createFlashcardStats(List<FlashcardDeck> decks, List<FlashcardTerm> terms) {
         int totalCards = terms.size();
         int totalDecks = decks.size();
+
+        if (totalCards == 0) {
+            return new FlashcardStats(0, 0, 0, 0, "None");
+        }
 
         // Calculate average rating
         double avgRating = terms.stream()
@@ -367,15 +424,24 @@ public class StatsViewModel extends AndroidViewModel {
                 .average()
                 .orElse(0);
 
-        // Find most studied deck
+        // Find most studied deck (deck with most cards)
         String mostStudiedDeck = decks.stream()
-                .max(Comparator.comparingInt(FlashcardDeck::getCardCount))
+                .max(Comparator.comparingInt(deck -> {
+                    List<FlashcardTerm> deckTerms = flashcardRepository.getTermsForDeckSync(deck.getId());
+                    return deckTerms != null ? deckTerms.size() : 0;
+                }))
                 .map(FlashcardDeck::getTitle)
                 .orElse("None");
 
-        int accuracy = (int) ((avgRating / 5.0) * 100);
+        // Count mastered cards (rating >= 4)
+        long masteredCards = terms.stream()
+                .filter(term -> term.getRating() >= 4)
+                .count();
 
-        return new FlashcardStats(totalDecks, totalCards, accuracy, 0, mostStudiedDeck);
+        int accuracy = (int) ((avgRating / 5.0) * 100);
+        int masteryPercentage = (int) ((masteredCards * 100) / totalCards);
+
+        return new FlashcardStats(totalDecks, totalCards, accuracy, masteryPercentage, mostStudiedDeck);
     }
 
     private QuizStats createQuizStats(List<Quiz> quizzes, List<QuizAttempt> attempts) {
@@ -413,15 +479,51 @@ public class StatsViewModel extends AndroidViewModel {
         return new QuizStats((int) avgScore, fastestFormatted, highestScoreDeck, highestScore, attempts.size());
     }
 
-    private NotesStats createNotesStats(List<Resource> resources) {
-        // Placeholder - you'll need to implement NoteRepository
-        int notesCount = 32; // Get from NoteRepository
-        int resourcesCount = resources != null ? resources.size() : 0;
+//    private NotesStats createNotesStats(List<Resource> resources) {
+//        int resourcesCount = resources != null ? resources.size() : 0;
+//
+//        // Get notes count from resources (assuming some resources are notes)
+//        long notesCount = resources != null ?
+//                resources.stream().filter(resource ->
+//                        resource.getType().equals("NOTE") ||
+//                                resource.getTitle().toLowerCase().contains("note")).count() : 0;
+//
+//        // Find most used subject for notes
+//        String mostUsedSubject = "None";
+//        if (resources != null && !resources.isEmpty()) {
+//            Map<Long, Integer> subjectUsage = new HashMap<>();
+//            for (Resource resource : resources) {
+//                Long subjectId = resource.getSubjectId();
+//                subjectUsage.put(subjectId, subjectUsage.getOrDefault(subjectId, 0) + 1);
+//            }
+//
+//            Long mostUsedSubjectId = subjectUsage.entrySet().stream()
+//                    .max(Map.Entry.comparingByValue())
+//                    .map(Map.Entry::getKey)
+//                    .orElse(null);
+//
+//            if (mostUsedSubjectId != null) {
+//                Subject subject = subjectRepository.getSubjectByIdSync(mostUsedSubjectId);
+//                mostUsedSubject = subject != null ? subject.getName() : "Unknown";
+//            }
+//        }
+//
+//        // Get most viewed note
+////        String mostViewedNote = "None";
+////        int mostViewedCount = 0;
+////        if (resources != null) {
+////            for (Resource resource : resources) {
+////                if (resource.getViewCount() > mostViewedCount) {
+////                    mostViewedCount = resource.getViewCount();
+////                    mostViewedNote = resource.getTitle();
+////                }
+////            }
+////        }
+//
+//        return new NotesStats((int) notesCount, resourcesCount, mostUsedSubject, mostViewedNote, mostViewedCount);
+//    }
 
-        return new NotesStats(notesCount, resourcesCount, "Mathematics", "Derivatives Summary", 5);
-    }
-
-    // Utility methods (same as before)
+    // Utility methods
 
     private String formatStudyTime(float minutes) {
         if (minutes < 60) {
@@ -433,7 +535,7 @@ public class StatsViewModel extends AndroidViewModel {
     }
 
     private String formatStudyTime(long milliseconds) {
-        float minutes = milliseconds / (1000 * 60);
+        float minutes = milliseconds / (1000.0f * 60.0f);
         return formatStudyTime(minutes);
     }
 
@@ -450,6 +552,23 @@ public class StatsViewModel extends AndroidViewModel {
         return "Week " + week;
     }
 
+    private int getDayIndex(String day, String[] days) {
+        for (int i = 0; i < days.length; i++) {
+            if (days[i].equalsIgnoreCase(day)) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    private int extractWeekNumber(String weekString) {
+        try {
+            return Integer.parseInt(weekString.replace("Week ", ""));
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
     private Date getTomorrow() {
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_YEAR, 1);
@@ -463,6 +582,8 @@ public class StatsViewModel extends AndroidViewModel {
     }
 
     private boolean isSameDay(Date date1, Date date2) {
+        if (date1 == null || date2 == null) return false;
+
         Calendar cal1 = Calendar.getInstance();
         Calendar cal2 = Calendar.getInstance();
         cal1.setTime(date1);
@@ -483,24 +604,6 @@ public class StatsViewModel extends AndroidViewModel {
         long minutes = durationMs / (1000 * 60);
         long seconds = (durationMs % (1000 * 60)) / 1000;
         return String.format(Locale.getDefault(), "%dm %ds", minutes, seconds);
-    }
-
-    private List<StudySession> createMockSessions() {
-        List<StudySession> sessions = new ArrayList<>();
-        Calendar cal = Calendar.getInstance();
-
-        // Create mock data for the last 7 days
-        for (int i = 6; i >= 0; i--) {
-            cal.setTime(new Date());
-            cal.add(Calendar.DAY_OF_YEAR, -i);
-
-            StudySession session = new StudySession();
-            session.setStartTime(cal.getTime());
-            session.setDuration((long) (Math.random() * 120 + 30) * 60 * 1000); // 30-150 minutes
-            sessions.add(session);
-        }
-
-        return sessions;
     }
 
     // Getters for LiveData

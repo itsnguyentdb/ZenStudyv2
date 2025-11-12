@@ -43,6 +43,24 @@ public class SubjectRepositoryImpl {
         return subjectDao.save(subject);
     }
 
+    public List<Subject> getAllSubjectsSync() {
+        try {
+            return subjectDao.findAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return java.util.List.of();
+        }
+    }
+
+    public Subject getSubjectByIdSync(long subjectId) {
+        try {
+            return subjectDao.findById(subjectId).orElse(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public void deleteSubjectById(long subjectId) {
         subjectDao.deleteById(subjectId);
     }

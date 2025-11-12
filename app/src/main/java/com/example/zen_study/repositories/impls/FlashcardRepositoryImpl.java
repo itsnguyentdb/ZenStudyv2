@@ -14,7 +14,6 @@ import com.example.zen_study.models.FlashcardTerm;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Executor;
 
@@ -30,6 +29,26 @@ public class FlashcardRepositoryImpl {
         this.executor = instance.getQueryExecutor();
     }
 
+    // Add synchronous methods
+    public List<FlashcardDeck> getAllDecksSync() {
+        try {
+            return flashcardDeckDao.findAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return java.util.List.of();
+        }
+    }
+
+    public List<FlashcardTerm> getTermsForDeckSync(long deckId) {
+        try {
+            return flashcardTermDao.findByDeckIdSync(deckId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return java.util.List.of();
+        }
+    }
+
+    // Existing methods remain the same...
     public FlashcardDeck createFlashcardDeck(String title, String description, long subjectId) {
         final var result = new FlashcardDeck[1];
         executor.execute(() -> {

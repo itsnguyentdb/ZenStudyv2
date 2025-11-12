@@ -19,13 +19,6 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Event extends BaseEntity {
-    public enum EventSource {
-        LOCAL,      // Created by user in your app
-        GOOGLE,     // Synced from Google Calendar
-        OUTLOOK,    // Synced from Outlook
-        APPLE       // Synced from Apple Calendar
-    }
-
     @ColumnInfo(name = "subject_id")
     private long subjectId;
     private String title;
